@@ -19,4 +19,7 @@ COPY . .
 # DocumentRoot diarahkan ke /public sesuai struktur project (public/ = entry point)
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
+# Izinkan .htaccess override supaya routing lewat public/index.php berfungsi
+RUN printf '<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\n' >> /etc/apache2/apache2.conf
+
 EXPOSE 80

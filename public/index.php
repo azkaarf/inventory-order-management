@@ -1,22 +1,33 @@
 <?php
-// Smoke-test sementara — akan diganti router asli begitu Fase 1 (Auth) dimulai.
-require_once __DIR__ . '/../vendor/autoload.php';
 
-echo "<h1>Inventory &amp; Order Management System</h1>";
-echo "<p>Skeleton jalan. PHP version: " . PHP_VERSION . "</p>";
+declare(strict_types=1);
 
-try {
-    $pdo = new PDO(
-        sprintf(
-            'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
-            getenv('DB_HOST'),
-            getenv('DB_PORT') ?: 3306,
-            getenv('DB_NAME')
-        ),
-        getenv('DB_USER'),
-        getenv('DB_PASSWORD')
-    );
-    echo "<p>&#9989; Koneksi database berhasil.</p>";
-} catch (PDOException $e) {
-    echo "<p>&#10060; Koneksi database gagal: " . htmlspecialchars($e->getMessage()) . "</p>";
+require __DIR__ . '/../config/bootstrap.php';
+
+use App\Controller\AuthController;
+use App\Repository\MySqlUserRepository;
+use App\Service\AuthService;
+
+$authService = new AuthService(new MySqlUserRepository());
+$authController = new AuthController($authService);
+
+$routes = [
+    'GET /'         => [$authController, 'showLoginForm'],
+    'GET /login'    => [$authController, 'showLoginForm'],
+    'POST /login'   => [$authController, 'login'],
+    'POST /logout'  => [$authController, 'logout'],
+    'GET /dashboard'=> [$authController, 'dashboard'],
+];
+
+$method = $_SERVER['REQUEST_METHOD'];
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+$key = "$method $path";
+
+if (!isset($routes[$key])) {
+    http_response_code(404);
+    echo '404 Not Found';
+    exit;
 }
+
+[$controller, $action] = $routes[$key];
+$controller->$action();
