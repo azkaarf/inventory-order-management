@@ -10,6 +10,10 @@
     <p>Halo, <?= htmlspecialchars($user['name']) ?> (<?= htmlspecialchars($user['role']) ?>)</p>
     <p><em>Placeholder — akan diganti dashboard sungguhan per role di Fase 6 (DASH-01).</em></p>
 
+    <?php if ($user['role'] === 'Admin'): ?>
+        <p><a href="/users">Kelola User</a></p>
+    <?php endif; ?>
+
     <form method="POST" action="/logout">
         <button type="submit">Logout</button>
     </form>

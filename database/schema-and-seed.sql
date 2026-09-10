@@ -26,3 +26,26 @@ VALUES (
     1
 )
 ON DUPLICATE KEY UPDATE email = email;
+
+-- Dua akun tambahan buat uji segregation of duties (USR-01 & nanti SO-01):
+-- Sales Demo   : sales1@demo.test / sales123
+-- Warehouse Demo: gudang1@demo.test / gudang123
+INSERT INTO user (name, email, password_hash, role, is_active)
+VALUES (
+    'Sales Demo',
+    'sales1@demo.test',
+    '$2b$10$UeVLD0qPUMMjy48LM7yH6uz/n50BJG1wL4BPN1Odp.8dmscKFcZ.a',
+    'Sales',
+    1
+)
+ON DUPLICATE KEY UPDATE email = email;
+
+INSERT INTO user (name, email, password_hash, role, is_active)
+VALUES (
+    'Warehouse Demo',
+    'gudang1@demo.test',
+    '$2b$10$LTOqX2u01mV7Q18JzYiB2uYTvCN10JgvfFvGuM5c6IAt3TCtJMpD6',
+    'WarehouseStaff',
+    1
+)
+ON DUPLICATE KEY UPDATE email = email;
