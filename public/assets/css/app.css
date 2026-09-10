@@ -1,0 +1,141 @@
+/* Reset dasar */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background-color: #f5f6f8;
+    color: #1f2933;
+    line-height: 1.5;
+}
+
+a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Top navigation bar */
+.topbar {
+    background-color: #1f2933;
+    color: #fff;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topbar a {
+    color: #fff;
+    margin-right: 16px;
+}
+
+.topbar .topbar-brand {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-right: 16px;
+}
+
+.topbar form {
+    display: inline;
+}
+
+.topbar button {
+    background: none;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Container utama */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+h1 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+}
+
+/* Form */
+form.stacked label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+form.stacked input[type="text"],
+form.stacked input[type="email"],
+form.stacked input[type="password"],
+form.stacked select {
+    display: block;
+    width: 100%;
+    max-width: 360px;
+    margin-top: 4px;
+    padding: 8px 10px;
+    border: 1px solid #cbd2d9;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+button, input[type="submit"] {
+    background-color: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #1d4ed8;
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    margin-top: 16px;
+}
+
+table th, table td {
+    border: 1px solid #e4e7eb;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+table th {
+    background-color: #f0f2f5;
+}
+
+/* Alert / pesan error */
+.alert-error {
+    background-color: #fdecea;
+    border: 1px solid #f5c2c0;
+    color: #b3261e;
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+.alert-error ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.hint {
+    color: #6b7280;
+    font-size: 0.9rem;
+}

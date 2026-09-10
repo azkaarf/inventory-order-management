@@ -1,31 +1,26 @@
-<?php /** @var string|null $error */ ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Login - Inventory & Order Management</title>
-</head>
-<body>
-    <h1>Login</h1>
+<?php
+/** @var string|null $error */
+$pageTitle = 'Login';
+require __DIR__ . '/../layout/header.php';
+?>
+<h1>Login</h1>
 
-    <?php if ($error): ?>
-        <p style="color:red;"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
+<?php if ($error): ?>
+    <div class="alert-error"><?= htmlspecialchars($error) ?></div>
+<?php endif; ?>
 
-    <form method="POST" action="/login">
-        <label>
-            Email
-            <input type="email" name="email" required>
-        </label>
-        <br>
-        <label>
-            Password
-            <input type="password" name="password" required>
-        </label>
-        <br>
-        <button type="submit">Login</button>
-    </form>
+<form method="POST" action="/login" class="stacked">
+    <label>
+        Email
+        <input type="email" name="email" required>
+    </label>
+    <label>
+        Password
+        <input type="password" name="password" required>
+    </label>
+    <button type="submit">Login</button>
+</form>
 
-    <p><small>Demo: admin@demo.test / admin123</small></p>
-</body>
-</html>
+<p class="hint">Demo: admin@demo.test / admin123</p>
+
+<?php require __DIR__ . '/../layout/footer.php'; ?>
