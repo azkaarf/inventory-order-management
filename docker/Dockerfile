@@ -5,6 +5,10 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_mysql mysqli zip gd \
     && a2enmod rewrite
 
+# Bab 1.3: konfigurasi runtime eksplisit (upload limit, memory, timezone),
+# bukan mengandalkan default image yang tidak terlihat/tidak terdokumentasi
+COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+
 # Composer diambil dari image resmi, tidak perlu install manual
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 

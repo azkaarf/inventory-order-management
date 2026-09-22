@@ -21,7 +21,7 @@ final class AuthServiceTest extends TestCase
         );
     }
 
-    public function test_login_berhasil_dengan_kredensial_benar(): void
+    public function test_login_succeeds_with_correct_credentials(): void
     {
         $repo = new InMemoryUserRepository();
         $repo->add($this->makeUser('a@test.com', 'secret123'));
@@ -33,18 +33,18 @@ final class AuthServiceTest extends TestCase
         $this->assertSame('a@test.com', $user->email);
     }
 
-    public function test_login_gagal_kalau_password_salah(): void
+    public function test_login_fails_when_password_is_wrong(): void
     {
         $repo = new InMemoryUserRepository();
         $repo->add($this->makeUser('a@test.com', 'secret123'));
 
         $service = new AuthService($repo);
-        $user = $service->attemptLogin('a@test.com', 'password-salah');
+        $user = $service->attemptLogin('a@test.com', 'wrong-password');
 
         $this->assertNull($user);
     }
 
-    public function test_login_gagal_kalau_user_tidak_aktif(): void
+    public function test_login_fails_when_user_is_inactive(): void
     {
         $repo = new InMemoryUserRepository();
         $repo->add($this->makeUser('a@test.com', 'secret123', active: false));
@@ -55,12 +55,12 @@ final class AuthServiceTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function test_login_gagal_kalau_email_tidak_terdaftar(): void
+    public function test_login_fails_when_email_is_not_registered(): void
     {
         $repo = new InMemoryUserRepository();
 
         $service = new AuthService($repo);
-        $user = $service->attemptLogin('tidak-ada@test.com', 'secret123');
+        $user = $service->attemptLogin('not-registered@test.com', 'secret123');
 
         $this->assertNull($user);
     }

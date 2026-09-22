@@ -18,6 +18,7 @@ final class UserController
         AuthGuard::requireRole(['Admin']);
 
         $users = $this->userService->listUsers();
+        $error = $_GET['error'] ?? null;
         require __DIR__ . '/../../views/users/index.php';
     }
 
@@ -42,7 +43,7 @@ final class UserController
         $errors = $this->userService->validateForCreate($name, $email, $password, $role);
 
         if (!empty($errors)) {
-            // VAL-01: input yang sudah diisi dipertahankan supaya user tidak perlu ngetik ulang
+            // VAL-01: entered input is preserved so the user doesn't have to retype it
             $old = ['name' => $name, 'email' => $email, 'role' => $role];
             require __DIR__ . '/../../views/users/create.php';
             return;
@@ -94,7 +95,12 @@ final class UserController
         $id = (int) ($_POST['id'] ?? 0);
         $active = (int) ($_POST['active'] ?? 0) === 1;
 
-        $this->userService->setActive($id, $active);
+        $success = $this->userService->setActive($id, $active);
+
+        if (!$success) {
+            header('Location: /users?error=last-admin');
+            exit;
+        }
 
         header('Location: /users');
         exit;
@@ -106,7 +112,7 @@ final class UserController
 
         if ($user === null) {
             http_response_code(404);
-            echo '404 Not Found — user tidak ditemukan.';
+            echo '404 Not Found — user not found.';
             exit;
         }
 

@@ -1,0 +1,11 @@
+{
+  "name": "bliss-frontend-tests",
+  "private": true,
+  "description": "Jest tests for BLISS's small vanilla JS module (TEST-01 equivalent, JS side).",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

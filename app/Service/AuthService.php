@@ -13,9 +13,9 @@ final class AuthService
     }
 
     /**
-     * AUTH-01: kredensial salah ATAU user nonaktif harus menghasilkan hasil yang
-     * sama (null) — supaya pesan errornya generik, tidak membocorkan bagian mana
-     * yang salah.
+     * AUTH-01: wrong credentials OR an inactive user must produce the same
+     * result (null) — so the error message stays generic and doesn't leak
+     * which part was wrong.
      */
     public function attemptLogin(string $email, string $password): ?User
     {

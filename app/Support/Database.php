@@ -19,15 +19,27 @@ final class Database
                 getenv('DB_NAME')
             );
 
-            try {
-                self::$connection = new PDO($dsn, getenv('DB_USER'), getenv('DB_PASSWORD'), [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                ]);
-            } catch (PDOException $e) {
-                // ERR-01: jangan expose detail koneksi/kredensial ke user
-                error_log('DB connection failed: ' . $e->getMessage());
-                throw new PDOException('Database connection failed.');
+            $maxAttempts = 5;
+
+            for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+                try {
+                    self::$connection = new PDO($dsn, getenv('DB_USER'), getenv('DB_PASSWORD'), [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    ]);
+                    break;
+                } catch (PDOException $e) {
+                    if ($attempt === $maxAttempts) {
+                        // ERR-01: never expose connection/credential details to the user
+                        error_log('DB connection failed after ' . $maxAttempts . ' attempts: ' . $e->getMessage());
+                        throw new PDOException('Database connection failed.');
+                    }
+
+                    // MySQL's official image briefly restarts internally right after running
+                    // init.sql on a fresh volume (i.e. right after `docker compose down -v`) —
+                    // a short retry absorbs that window instead of failing the whole request.
+                    sleep(1);
+                }
             }
         }
 

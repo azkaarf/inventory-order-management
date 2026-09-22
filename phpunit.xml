@@ -11,4 +11,13 @@
             <directory>tests/Integration</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <!--
+            Bab 10.3: test database terisolasi dari data development.
+            Unit tests never touch the DB at all (short-circuit before any
+            query runs), so this only actually matters for Integration tests
+            - which now hit inventory_test instead of inventory.
+        -->
+        <env name="DB_NAME" value="inventory_test" force="true"/>
+    </php>
 </phpunit>

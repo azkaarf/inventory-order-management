@@ -5,8 +5,8 @@ namespace App\Repository;
 use App\Entity\User;
 
 /**
- * Fake repository untuk unit test — tidak menyentuh database sungguhan.
- * Bukti ARCH-01: AuthService bisa diuji tanpa koneksi PDO nyata.
+ * Fake repository for unit tests — never touches a real database.
+ * Proof for ARCH-01: AuthService can be tested without a real PDO connection.
  */
 final class InMemoryUserRepository implements UserRepositoryInterface
 {

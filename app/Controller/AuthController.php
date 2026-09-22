@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Service\AuthService;
-use App\Support\AuthGuard;
 
 final class AuthController
 {
@@ -14,7 +13,7 @@ final class AuthController
 
     public function showLoginForm(): void
     {
-        $error = isset($_GET['error']) ? 'Email atau password salah.' : null;
+        $error = isset($_GET['error']) ? 'Incorrect email or password.' : null;
         require __DIR__ . '/../../views/auth/login.php';
     }
 
@@ -30,7 +29,7 @@ final class AuthController
             exit;
         }
 
-        // AUTH-01: ID session diperbarui setelah login berhasil
+        // AUTH-01: session ID is regenerated after a successful login
         session_regenerate_id(true);
         $_SESSION['user'] = [
             'id' => $user->id,
@@ -44,17 +43,11 @@ final class AuthController
 
     public function logout(): void
     {
-        // AUTH-02: hapus seluruh data autentikasi pada session
+        // AUTH-02: clear all authentication data from the session
         $_SESSION = [];
         session_destroy();
 
         header('Location: /login');
         exit;
-    }
-
-    public function dashboard(): void
-    {
-        $user = AuthGuard::requireLogin();
-        require __DIR__ . '/../../views/dashboard/placeholder.php';
     }
 }

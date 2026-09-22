@@ -1,7 +1,8 @@
 /vendor/
+/node_modules/
 .env
 *.log
-/uploads/*
-!/uploads/.gitkeep
+/public/uploads/*
+!/public/uploads/.gitkeep
 .DS_Store
 .phpunit.result.cache

@@ -10,6 +10,7 @@ require __DIR__ . '/../layout/header.php';
 <?php endif; ?>
 
 <form method="POST" action="/login" class="stacked">
+                <?= \App\Support\Csrf::field() ?>
     <label>
         Email
         <input type="email" name="email" required>

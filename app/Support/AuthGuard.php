@@ -5,9 +5,9 @@ namespace App\Support;
 final class AuthGuard
 {
     /**
-     * Pastikan user sudah login. Kalau belum, redirect ke halaman login dan
-     * hentikan eksekusi. Panggil ini di awal method Controller untuk halaman
-     * terproteksi (AUTH-01: halaman terlindungi tidak dapat diakses tanpa session).
+     * Make sure the user is logged in. If not, redirect to the login page and
+     * stop execution. Call this at the start of a Controller method for any
+     * protected page (AUTH-01: protected pages cannot be accessed without a session).
      */
     public static function requireLogin(): array
     {
@@ -20,8 +20,8 @@ final class AuthGuard
     }
 
     /**
-     * Sama seperti requireLogin(), tapi sekaligus cek role. Dipakai nanti untuk
-     * membedakan halaman Admin/Sales/WarehouseStaff (segregation of duties).
+     * Same as requireLogin(), but also checks the role. Used to separate
+     * Admin/Sales/WarehouseStaff pages (segregation of duties).
      *
      * @param string[] $allowedRoles
      */
@@ -31,7 +31,7 @@ final class AuthGuard
 
         if (!in_array($user['role'], $allowedRoles, true)) {
             http_response_code(403);
-            echo '403 Forbidden — kamu tidak punya akses ke halaman ini.';
+            echo '403 Forbidden — you do not have access to this page.';
             exit;
         }
 
