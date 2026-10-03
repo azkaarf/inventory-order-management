@@ -6,7 +6,6 @@
 $pageTitle = 'Create Sales Order';
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Create Sales Order</h1>
 <p><a href="/sales-orders">&larr; Back</a></p>
 
 <?php if (!empty($errors)): ?>

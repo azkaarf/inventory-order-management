@@ -118,38 +118,6 @@ a:hover {
     border-left-color: var(--color-primary);
 }
 
-.sidebar-footer {
-    margin-top: auto;
-    padding: 16px 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    font-size: 0.85rem;
-}
-
-.sidebar-footer .user-name {
-    display: block;
-    margin-bottom: 10px;
-    color: #e2e8f0;
-}
-
-.sidebar-footer form {
-    display: inline;
-}
-
-.sidebar-footer button {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: #fff;
-    padding: 6px 14px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: background 0.15s;
-}
-
-.sidebar-footer button:hover {
-    background: rgba(255, 255, 255, 0.18);
-}
-
 .main {
     flex: 1;
     min-width: 0;
@@ -250,6 +218,22 @@ button, input[type="submit"] {
 
 button:hover {
     background-color: var(--color-primary-dark);
+}
+
+a.btn-primary {
+    display: inline-block;
+    background-color: var(--color-primary);
+    color: #fff;
+    padding: 9px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a.btn-primary:hover {
+    background-color: var(--color-primary-dark);
+    text-decoration: none;
 }
 
 button:active {
@@ -408,8 +392,470 @@ select:focus-visible {
     margin: 0;
 }
 
+/* ===== Topbar (terpisah dari sidebar) ===== */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 24px;
+    height: 60px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: var(--layer-sticky);
+}
+
+.topbar-search {
+    flex: 1;
+    max-width: 320px;
+}
+
+.topbar-search input {
+    width: 100%;
+    padding: 8px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    background: var(--color-bg);
+}
+
+.topbar-search input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.topbar-user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.82rem;
+    flex-shrink: 0;
+}
+
+.topbar-user-info {
+    line-height: 1.25;
+    white-space: nowrap;
+}
+
+.topbar-user-name {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--color-text);
+}
+
+.topbar-user-role {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+}
+
+.topbar-user form {
+    display: inline;
+}
+
+.topbar-logout-btn {
+    background: transparent;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.topbar-logout-btn:hover {
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+/* ===== Page header ===== */
+.page-header {
+    margin-bottom: 22px;
+}
+
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+}
+
+.breadcrumb a {
+    color: var(--color-text-muted);
+}
+
+.breadcrumb a:hover {
+    color: var(--color-primary);
+}
+
+.breadcrumb .sep {
+    color: var(--color-border);
+}
+
+.page-header h1 {
+    margin: 0;
+}
+
+.page-header .page-subtitle {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+/* ===== Progress bars (dashboard status breakdown) ===== */
+.progress-list {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 4px 20px;
+    margin: 16px 0 30px;
+}
+
+.progress-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.progress-row:last-child {
+    border-bottom: none;
+}
+
+.progress-row-label {
+    flex: 0 0 150px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.progress-track {
+    flex: 1;
+    height: 8px;
+    background: var(--color-bg);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.progress-bar-gray  { background: #94a3b8; }
+.progress-bar-amber { background: #d97706; }
+.progress-bar-blue  { background: #2563eb; }
+.progress-bar-green { background: #16a34a; }
+.progress-bar-red   { background: #dc2626; }
+
+.progress-row-count {
+    flex: 0 0 44px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 0.92rem;
+}
+
+/* ===== Table toolbar (search + filter + export dalam satu baris) ===== */
+.table-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.table-toolbar .field {
+    margin: 0;
+}
+
+.table-toolbar-spacer {
+    flex: 1;
+}
+
+.btn-export {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-export:hover {
+    background: var(--color-bg);
+}
+
+/* ===== Icon action buttons (view/edit/deactivate/delete) ===== */
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.icon-btn:hover {
+    background: var(--color-bg);
+    border-color: var(--color-primary);
+    text-decoration: none;
+}
+
+.icon-btn-group {
+    display: flex;
+    gap: 6px;
+}
+
+.icon-btn-group form {
+    display: inline-flex;
+}
+
+/* ===== Pagination ("Showing X to Y of Z" + page buttons) ===== */
+.pagination-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.pagination-links {
+    display: flex;
+    gap: 4px;
+}
+
+.pagination-links a,
+.pagination-links span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    font-size: 0.82rem;
+}
+
+.pagination-links a {
+    color: var(--color-text);
+    background: var(--color-surface);
+}
+
+.pagination-links a:hover {
+    background: var(--color-bg);
+    text-decoration: none;
+}
+
+.pagination-links span.current {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+}
+
+/* ===== Form validation - wajib diisi ditandai otomatis lewat :has() ===== */
+form.stacked label:has(> input:required)::after,
+form.stacked label:has(> select:required)::after,
+form.stacked .field-label:has(+ input:required)::after {
+    content: " *";
+    color: #dc2626;
+    font-weight: 700;
+}
+
+/* :user-invalid = merah HANYA setelah user pernah berinteraksi dengan field
+   itu, bukan langsung merah saat halaman dimuat (beda dari :invalid biasa). */
+form.stacked input:user-invalid,
+form.stacked select:user-invalid {
+    border-color: #dc2626;
+}
+
+form.stacked input:user-invalid:focus,
+form.stacked select:user-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.field-hint-error {
+    display: none;
+    color: #dc2626;
+    font-size: 0.8rem;
+    margin-top: 4px;
+}
+
+form.stacked input:user-invalid ~ .field-hint-error {
+    display: block;
+}
+
+/* ===== Product thumbnail (list table) ===== */
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.product-thumb {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    border: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+
+.product-thumb-placeholder {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+/* ===== Login page ===== */
+.login-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, #1f2933, #0f172a);
+    padding: 24px;
+}
+
+.login-card {
+    background: var(--color-surface);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    width: 100%;
+    max-width: 380px;
+    padding: 36px 32px;
+}
+
+.login-logo {
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--color-primary);
+    margin-bottom: 2px;
+}
+
+.login-tagline {
+    text-align: center;
+    font-size: 0.68rem;
+    color: var(--color-text-muted);
+    margin-bottom: 18px;
+}
+
+.login-subtitle {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.88rem;
+    margin-bottom: 24px;
+}
+
+.login-card form.stacked label {
+    margin-bottom: 16px;
+}
+
+.password-field {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 8px;
+    top: 33px;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 6px;
+}
+
+.password-toggle:hover {
+    color: var(--color-primary);
+    background: none;
+}
+
+.login-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: -6px 0 18px;
+    font-size: 0.85rem;
+}
+
+.login-options .remember-me {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: normal;
+    cursor: pointer;
+    margin: 0;
+}
+
+.login-options .remember-me input {
+    margin: 0;
+    accent-color: var(--color-primary);
+}
+
+.login-card button[type="submit"] {
+    width: 100%;
+    padding: 11px;
+    font-size: 0.95rem;
+}
+
+.login-demo-hint {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    background: var(--color-bg);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+}
+
 /* ===== Responsive (UI-01: usable at 360px) ===== */
 @media (max-width: 768px) {
+    .topbar-search {
+        display: none;
+    }
+
     .app-shell {
         flex-direction: column;
     }
@@ -451,26 +897,19 @@ select:focus-visible {
     .sidebar-nav > a.nav-link.active {
         border-left: none;
     }
-
-    .sidebar-footer {
-        margin-top: 0;
-        margin-left: auto;
-        border-top: none;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 6px 0;
-    }
-
-    .sidebar-footer .user-name {
-        margin-bottom: 0;
-        white-space: nowrap;
-    }
 }
 
 @media (max-width: 600px) {
     .container {
         padding-block: 16px;
+    }
+
+    .topbar {
+        padding: 0 16px;
+    }
+
+    .topbar-user-info {
+        display: none;
     }
 
     .stat-grid {

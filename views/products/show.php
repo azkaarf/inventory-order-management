@@ -5,7 +5,6 @@
 $pageTitle = $product->name;
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1><?= htmlspecialchars($product->name) ?></h1>
 <p><a href="/products">&larr; Back</a></p>
 
 <?php if ($product->imagePath): ?>

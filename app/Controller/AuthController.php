@@ -37,6 +37,20 @@ final class AuthController
             'role' => $user->role,
         ];
 
+        // Remember me: re-send the same session cookie with a 30-day expiry
+        // instead of the default session-only cookie. Only affects the
+        // browser's copy of the cookie - the server-side session itself is
+        // identical either way (see docker/uploads.ini for why
+        // gc_maxlifetime was raised to match).
+        if (!empty($_POST['remember_me'])) {
+            setcookie(session_name(), session_id(), [
+                'expires' => time() + 60 * 60 * 24 * 30,
+                'path' => '/',
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+        }
+
         header('Location: /dashboard');
         exit;
     }

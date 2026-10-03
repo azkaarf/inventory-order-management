@@ -8,7 +8,6 @@ $pageTitle = 'Purchase Order #' . $purchaseOrder->id;
 require __DIR__ . '/../layout/header.php';
 $error = $_GET['error'] ?? null;
 ?>
-<h1>Purchase Order #<?= $purchaseOrder->id ?></h1>
 <p><a href="/purchase-orders">&larr; Back</a></p>
 
 <?php if ($error === 'cannot-order'): ?>

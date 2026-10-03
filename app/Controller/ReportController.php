@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Service\DashboardService;
 use App\Support\AuthGuard;
+use App\Support\CsvResponse;
 
 /**
  * REPORT-01: CSV exports built from the exact same aggregation queries as
@@ -39,7 +40,7 @@ final class ReportController
 
         $rows = $this->dashboardService->stockLedgerReport($from, $to);
 
-        $this->streamCsv("stock-ledger_{$from}_to_{$to}.csv", function ($out) use ($rows) {
+        CsvResponse::stream("stock-ledger_{$from}_to_{$to}.csv", function ($out) use ($rows) {
             fputcsv($out, ['Date', 'SKU', 'Product', 'Warehouse', 'Movement', 'Quantity', 'Reference', 'Performed By']);
             foreach ($rows as $row) {
                 fputcsv($out, [
@@ -69,7 +70,7 @@ final class ReportController
         $createdBy = $user['role'] === 'Sales' ? (int) $user['id'] : null;
         $rows = $this->dashboardService->orderStatusReport($from, $to, $createdBy);
 
-        $this->streamCsv("orders_{$from}_to_{$to}.csv", function ($out) use ($rows) {
+        CsvResponse::stream("orders_{$from}_to_{$to}.csv", function ($out) use ($rows) {
             fputcsv($out, ['Type', 'Order #', 'Party', 'Status', 'Order Date']);
             foreach ($rows as $row) {
                 fputcsv($out, [$row['type'], $row['id'], $row['party_name'], $row['status'], $row['order_date']]);
@@ -92,15 +93,5 @@ final class ReportController
         }
 
         return [$from, $to, null];
-    }
-
-    private function streamCsv(string $filename, callable $writer): void
-    {
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-
-        $out = fopen('php://output', 'w');
-        $writer($out);
-        fclose($out);
     }
 }

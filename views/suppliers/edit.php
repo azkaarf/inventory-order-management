@@ -5,7 +5,6 @@
 $pageTitle = 'Edit Supplier';
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Edit Supplier</h1>
 <p><a href="/suppliers">&larr; Back</a></p>
 
 <?php if (!empty($errors)): ?>

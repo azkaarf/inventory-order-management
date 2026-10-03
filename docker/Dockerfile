@@ -4,26 +4,19 @@ RUN apt-get update && apt-get install -y \
         git unzip libzip-dev libpng-dev libonig-dev \
     && docker-php-ext-install pdo pdo_mysql mysqli zip gd \
     && a2enmod rewrite
-
-# Bab 1.3: konfigurasi runtime eksplisit (upload limit, memory, timezone),
-# bukan mengandalkan default image yang tidak terlihat/tidak terdokumentasi
 COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
-# Composer diambil dari image resmi, tidak perlu install manual
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy manifest dulu supaya layer composer install ter-cache saat source code berubah
 COPY composer.json composer.lock* ./
 RUN composer install --no-interaction --no-scripts --no-progress || true
 
 COPY . .
 
-# DocumentRoot diarahkan ke /public sesuai struktur project (public/ = entry point)
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
-# Izinkan .htaccess override supaya routing lewat public/index.php berfungsi
 RUN printf '<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\n' >> /etc/apache2/apache2.conf
 
 EXPOSE 80

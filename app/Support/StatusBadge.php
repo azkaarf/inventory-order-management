@@ -28,4 +28,9 @@ final class StatusBadge
 
         return sprintf('<span class="badge badge-%s">%s</span>', $color, htmlspecialchars($status));
     }
+
+    public static function colorFor(string $status): string
+    {
+        return self::COLOR_MAP[$status] ?? 'gray';
+    }
 }

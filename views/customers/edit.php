@@ -5,7 +5,6 @@
 $pageTitle = 'Edit Customer';
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Edit Customer</h1>
 <p><a href="/customers">&larr; Back</a></p>
 
 <?php if (!empty($errors)): ?>

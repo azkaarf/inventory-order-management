@@ -49,6 +49,19 @@ final class PurchaseOrderService
         ];
     }
 
+    /**
+     * REPORT-01 pattern: same filters/query as searchPurchaseOrders(), just
+     * without the 10/page cap.
+     *
+     * @return PurchaseOrder[]
+     */
+    public function exportPurchaseOrders(?string $q, ?string $status, string $sort): array
+    {
+        $result = $this->purchaseOrderRepository->search($q, $status, $sort, 1, 10000);
+
+        return $result['items'];
+    }
+
     public function findById(int $id): ?PurchaseOrder
     {
         return $this->purchaseOrderRepository->findById($id);

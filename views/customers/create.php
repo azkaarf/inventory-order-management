@@ -4,7 +4,6 @@
 $pageTitle = 'Add Customer';
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Add Customer</h1>
 <p><a href="/customers">&larr; Back</a></p>
 
 <?php if (!empty($errors)): ?>

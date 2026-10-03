@@ -6,7 +6,6 @@
 $pageTitle = 'Edit Product';
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Edit Product</h1>
 <p><a href="/products">&larr; Back</a></p>
 
 <?php if (!empty($errors)): ?>

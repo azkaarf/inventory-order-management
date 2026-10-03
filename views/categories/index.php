@@ -3,7 +3,6 @@
 $pageTitle = 'Product Categories';
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Product Categories</h1>
 
 <?php if (($error ?? null) === 'in-use'): ?>
     <div class="alert-error">This category cannot be deleted — it is still used by a product.</div>
@@ -24,12 +23,14 @@ require __DIR__ . '/../layout/header.php';
             <td><?= htmlspecialchars($category->name) ?></td>
             <td><?= htmlspecialchars($category->description ?? '-') ?></td>
             <td>
-                <a href="/categories/edit?id=<?= $category->id ?>" title="Edit">✏️</a>
-                <form method="POST" action="/categories/delete" style="display:inline" onsubmit="return confirm('Delete this category?');">
-                <?= \App\Support\Csrf::field() ?>
-                    <input type="hidden" name="id" value="<?= $category->id ?>">
-                    <button type="submit" title="Delete">🗑️</button>
-                </form>
+                <div class="icon-btn-group">
+                    <a href="/categories/edit?id=<?= $category->id ?>" class="icon-btn" title="Edit">✏️</a>
+                    <form method="POST" action="/categories/delete" onsubmit="return confirm('Delete this category?');">
+                    <?= \App\Support\Csrf::field() ?>
+                        <input type="hidden" name="id" value="<?= $category->id ?>">
+                        <button type="submit" class="icon-btn" title="Delete">🗑️</button>
+                    </form>
+                </div>
             </td>
         </tr>
     <?php endforeach; ?>

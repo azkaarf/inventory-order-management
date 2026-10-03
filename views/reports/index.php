@@ -6,7 +6,6 @@ $pageTitle = 'Reports';
 require __DIR__ . '/../layout/header.php';
 $role = $_SESSION['user']['role'];
 ?>
-<h1>Reports</h1>
 
 <?php if ($error === 'invalid-range'): ?>
     <div class="alert-error">That date range is invalid — check both dates and make sure "From" isn't after "To".</div>

@@ -4,7 +4,6 @@
 $pageTitle = 'Add User';
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Add User</h1>
 <p><a href="/users">&larr; Back</a></p>
 
 <?php if (!empty($errors)): ?>
@@ -19,16 +18,16 @@ require __DIR__ . '/../layout/header.php';
 
 <form method="POST" action="/users/create" class="stacked">
                 <?= \App\Support\Csrf::field() ?>
-    <label>Name <input type="text" name="name" value="<?= htmlspecialchars($old['name']) ?>" required></label><br>
-    <label>Email <input type="email" name="email" value="<?= htmlspecialchars($old['email']) ?>" required></label><br>
-    <label>Password <input type="password" name="password" required></label><br>
+    <label>Name <input type="text" name="name" value="<?= htmlspecialchars($old['name']) ?>" required></label>
+    <label>Email <input type="email" name="email" value="<?= htmlspecialchars($old['email']) ?>" required></label>
+    <label>Password <input type="password" name="password" required></label>
     <label>Role
-        <select name="role">
+        <select name="role" required>
             <option value="Sales" <?= $old['role'] === 'Sales' ? 'selected' : '' ?>>Sales</option>
             <option value="WarehouseStaff" <?= $old['role'] === 'WarehouseStaff' ? 'selected' : '' ?>>Warehouse Staff</option>
             <option value="Admin" <?= $old['role'] === 'Admin' ? 'selected' : '' ?>>Admin</option>
         </select>
-    </label><br>
+    </label>
     <button type="submit">Save</button>
 </form>
 

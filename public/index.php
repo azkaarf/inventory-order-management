@@ -136,6 +136,7 @@ $routes = [
     'POST /warehouses/toggle' => [$warehouseController, 'toggleActive'],
 
     'GET /products'         => [$productController, 'index'],
+    'GET /products/export'  => [$productController, 'exportCsv'],
     'GET /products/show'    => [$productController, 'show'],
     'GET /products/create'  => [$productController, 'showCreateForm'],
     'POST /products/create' => [$productController, 'create'],
@@ -158,6 +159,7 @@ $routes = [
     'POST /customers/toggle' => [$customerController, 'toggleActive'],
 
     'GET /purchase-orders'               => [$purchaseOrderController, 'index'],
+    'GET /purchase-orders/export'        => [$purchaseOrderController, 'exportCsv'],
     'GET /purchase-orders/show'          => [$purchaseOrderController, 'show'],
     'GET /purchase-orders/create'        => [$purchaseOrderController, 'showCreateForm'],
     'POST /purchase-orders/create'       => [$purchaseOrderController, 'create'],
@@ -167,6 +169,7 @@ $routes = [
     'POST /purchase-orders/receive-item' => [$purchaseOrderController, 'receiveItem'],
 
     'GET /sales-orders'          => [$salesOrderController, 'index'],
+    'GET /sales-orders/export'   => [$salesOrderController, 'exportCsv'],
     'GET /sales-orders/show'     => [$salesOrderController, 'show'],
     'GET /sales-orders/create'   => [$salesOrderController, 'showCreateForm'],
     'POST /sales-orders/create'  => [$salesOrderController, 'create'],

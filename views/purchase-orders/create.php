@@ -6,7 +6,6 @@
 $pageTitle = 'Create Purchase Order';
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Create Purchase Order</h1>
 <p><a href="/purchase-orders">&larr; Back</a></p>
 
 <?php if (!empty($errors)): ?>

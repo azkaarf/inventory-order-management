@@ -3,14 +3,13 @@
 /** @var array $lowStockProducts */
 /** @var array $poStatusCounts */
 /** @var array $soStatusCounts */
-use App\Support\StatusBadge;
 
 $pageTitle = 'Dashboard';
+$pageSubtitle = 'An overview of inventory value, order pipeline, and stock health.';
 require __DIR__ . '/../layout/header.php';
 $poStatuses = ['Draft', 'Ordered', 'PartiallyReceived', 'Received', 'Cancelled'];
 $soStatuses = ['Draft', 'PendingApproval', 'Approved', 'Fulfilled', 'Cancelled'];
 ?>
-<h1>Dashboard</h1>
 
 <div class="stat-grid">
     <div class="stat-card">
@@ -29,29 +28,17 @@ $soStatuses = ['Draft', 'PendingApproval', 'Approved', 'Fulfilled', 'Cancelled']
     <h2>Purchase Orders by Status</h2>
     <a href="/purchase-orders">View all &rarr;</a>
 </div>
-<div class="stat-grid">
-    <?php foreach ($poStatuses as $s): ?>
-        <div class="stat-card">
-            <div class="stat-value"><?= $poStatusCounts[$s] ?? 0 ?></div>
-            <div class="stat-label"><?= StatusBadge::render($s) ?></div>
-        </div>
-    <?php endforeach; ?>
-</div>
+<?php $statuses = $poStatuses; $counts = $poStatusCounts; require __DIR__ . '/../partials/status-progress.php'; ?>
 
 <div class="section-heading">
     <h2>Sales Orders by Status</h2>
     <a href="/sales-orders">View all &rarr;</a>
 </div>
-<div class="stat-grid">
-    <?php foreach ($soStatuses as $s): ?>
-        <div class="stat-card">
-            <div class="stat-value"><?= $soStatusCounts[$s] ?? 0 ?></div>
-            <div class="stat-label"><?= StatusBadge::render($s) ?></div>
-        </div>
-    <?php endforeach; ?>
-</div>
+<?php $statuses = $soStatuses; $counts = $soStatusCounts; require __DIR__ . '/../partials/status-progress.php'; ?>
 
-<h2>Products Below Reorder Point (<?= count($lowStockProducts) ?>)</h2>
+<div class="section-heading">
+    <h2>Products Below Reorder Point (<?= count($lowStockProducts) ?>)</h2>
+</div>
 <table>
     <thead><tr><th>SKU</th><th>Name</th><th>Stock</th><th>Reorder Point</th></tr></thead>
     <tbody>

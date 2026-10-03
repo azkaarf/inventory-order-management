@@ -5,7 +5,6 @@
 $pageTitle = 'Edit Category';
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Edit Category</h1>
 <p><a href="/categories">&larr; Back</a></p>
 
 <?php if (!empty($errors)): ?>

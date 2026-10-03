@@ -6,6 +6,7 @@ use App\Entity\Product;
 use App\Service\CategoryService;
 use App\Service\ProductService;
 use App\Support\AuthGuard;
+use App\Support\CsvResponse;
 use App\Support\ImageUploader;
 use InvalidArgumentException;
 
@@ -180,6 +181,33 @@ final class ProductController
 
         header('Location: /products');
         exit;
+    }
+
+    public function exportCsv(): void
+    {
+        AuthGuard::requireLogin();
+
+        $q = trim($_GET['q'] ?? '');
+        $categoryId = ($_GET['category_id'] ?? '') !== '' ? (int) $_GET['category_id'] : null;
+        $stockStatus = in_array($_GET['stock_status'] ?? '', ['low', 'normal'], true) ? $_GET['stock_status'] : null;
+
+        $rows = $this->productService->exportProducts($q !== '' ? $q : null, $categoryId, $stockStatus);
+
+        CsvResponse::stream('products_' . date('Y-m-d') . '.csv', function ($out) use ($rows) {
+            fputcsv($out, ['SKU', 'Name', 'Category', 'Unit', 'Sell Price', 'Total Stock', 'Reorder Point', 'Status']);
+            foreach ($rows as $row) {
+                fputcsv($out, [
+                    $row['sku'],
+                    $row['name'],
+                    $row['category_name'],
+                    $row['unit'],
+                    $row['sell_price'],
+                    $row['total_stock'],
+                    $row['reorder_point'],
+                    $row['is_active'] ? 'Active' : 'Inactive',
+                ]);
+            }
+        });
     }
 
     /** @return array<string,string> */

@@ -51,6 +51,20 @@ final class SalesOrderService
         ];
     }
 
+    /**
+     * REPORT-01 pattern: same filters/query as searchSalesOrders(), just
+     * without the 10/page cap. $createdBy still restricts a Sales user to
+     * their own orders, same as the on-screen list.
+     *
+     * @return SalesOrder[]
+     */
+    public function exportSalesOrders(?string $q, ?string $status, string $sort, ?int $createdBy = null): array
+    {
+        $result = $this->salesOrderRepository->search($q, $status, $sort, 1, 10000, $createdBy);
+
+        return $result['items'];
+    }
+
     public function findById(int $id): ?SalesOrder
     {
         return $this->salesOrderRepository->findById($id);

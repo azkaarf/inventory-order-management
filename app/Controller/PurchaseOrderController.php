@@ -9,6 +9,7 @@ use App\Service\PurchaseOrderService;
 use App\Service\SupplierService;
 use App\Service\WarehouseService;
 use App\Support\AuthGuard;
+use App\Support\CsvResponse;
 
 final class PurchaseOrderController
 {
@@ -39,6 +40,24 @@ final class PurchaseOrderController
         );
 
         require __DIR__ . '/../../views/purchase-orders/index.php';
+    }
+
+    public function exportCsv(): void
+    {
+        AuthGuard::requireRole(self::ALLOWED_ROLES);
+
+        $q = trim($_GET['q'] ?? '');
+        $status = $_GET['status'] ?? '';
+        $sort = ($_GET['sort'] ?? '') === 'date_asc' ? 'date_asc' : 'date_desc';
+
+        $rows = $this->purchaseOrderService->exportPurchaseOrders($q !== '' ? $q : null, $status !== '' ? $status : null, $sort);
+
+        CsvResponse::stream('purchase-orders_' . date('Y-m-d') . '.csv', function ($out) use ($rows) {
+            fputcsv($out, ['PO #', 'Supplier', 'Warehouse', 'Status', 'Order Date']);
+            foreach ($rows as $po) {
+                fputcsv($out, [$po->id, $po->supplierName, $po->warehouseName, $po->status, $po->orderDate]);
+            }
+        });
     }
 
     public function show(): void

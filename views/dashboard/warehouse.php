@@ -5,9 +5,9 @@
 use App\Support\StatusBadge;
 
 $pageTitle = 'Dashboard';
+$pageSubtitle = "Today's action queue: goods receipt, goods issue, and stock to watch.";
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Dashboard</h1>
 
 <div class="stat-grid">
     <div class="stat-card">
@@ -27,7 +27,7 @@ require __DIR__ . '/../layout/header.php';
     </div>
 </div>
 
-<h2>Purchase Orders Awaiting Receipt</h2>
+<div class="section-heading"><h2>Purchase Orders Awaiting Receipt</h2></div>
 <table>
     <thead><tr><th>#</th><th>Supplier</th><th>Status</th><th>Order Date</th><th></th></tr></thead>
     <tbody>
@@ -46,7 +46,7 @@ require __DIR__ . '/../layout/header.php';
     </tbody>
 </table>
 
-<h2>Sales Orders Awaiting Goods Issue</h2>
+<div class="section-heading"><h2>Sales Orders Awaiting Goods Issue</h2></div>
 <table>
     <thead><tr><th>#</th><th>Customer</th><th>Status</th><th>Order Date</th><th></th></tr></thead>
     <tbody>
@@ -65,7 +65,7 @@ require __DIR__ . '/../layout/header.php';
     </tbody>
 </table>
 
-<h2>Low-Stock Products</h2>
+<div class="section-heading"><h2>Low-Stock Products</h2></div>
 <table>
     <thead><tr><th>SKU</th><th>Name</th><th>Stock</th><th>Reorder Point</th></tr></thead>
     <tbody>

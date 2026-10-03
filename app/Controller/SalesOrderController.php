@@ -8,6 +8,7 @@ use App\Service\ProductService;
 use App\Service\SalesOrderService;
 use App\Service\WarehouseService;
 use App\Support\AuthGuard;
+use App\Support\CsvResponse;
 use App\Support\InsufficientStockException;
 
 final class SalesOrderController
@@ -39,6 +40,25 @@ final class SalesOrderController
         );
 
         require __DIR__ . '/../../views/sales-orders/index.php';
+    }
+
+    public function exportCsv(): void
+    {
+        $user = AuthGuard::requireRole(['Admin', 'Sales', 'WarehouseStaff']);
+
+        $q = trim($_GET['q'] ?? '');
+        $status = $_GET['status'] ?? '';
+        $sort = ($_GET['sort'] ?? '') === 'date_asc' ? 'date_asc' : 'date_desc';
+        $createdBy = $user['role'] === 'Sales' ? (int) $user['id'] : null;
+
+        $rows = $this->salesOrderService->exportSalesOrders($q !== '' ? $q : null, $status !== '' ? $status : null, $sort, $createdBy);
+
+        CsvResponse::stream('sales-orders_' . date('Y-m-d') . '.csv', function ($out) use ($rows) {
+            fputcsv($out, ['SO #', 'Customer', 'Warehouse', 'Status', 'Order Date']);
+            foreach ($rows as $so) {
+                fputcsv($out, [$so->id, $so->customerName, $so->warehouseName, $so->status, $so->orderDate]);
+            }
+        });
     }
 
     public function show(): void

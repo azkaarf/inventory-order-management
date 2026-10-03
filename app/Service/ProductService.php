@@ -43,6 +43,20 @@ final class ProductService
         ];
     }
 
+    /**
+     * REPORT-01 pattern applied to Products: same filters, same Repository
+     * query as searchProducts(), just without the 10/page cap - so the CSV
+     * always matches exactly what search/filter would show onscreen.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function exportProducts(?string $q, ?int $categoryId, ?string $stockStatus): array
+    {
+        $result = $this->productRepository->search($q, $categoryId, $stockStatus, 1, 10000);
+
+        return $result['items'];
+    }
+
     public function findById(int $id): ?Product
     {
         return $this->productRepository->findById($id);

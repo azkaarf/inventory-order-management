@@ -3,7 +3,6 @@
 $pageTitle = 'Customers';
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Customers</h1>
 <p><a href="/customers/create">+ Add Customer</a></p>
 
 <table>
@@ -19,13 +18,15 @@ require __DIR__ . '/../layout/header.php';
             <td><?= htmlspecialchars($customer->address ?? '-') ?></td>
             <td><?= $customer->isActive ? 'Active' : 'Inactive' ?></td>
             <td>
-                <a href="/customers/edit?id=<?= $customer->id ?>" title="Edit">✏️</a>
-                <form method="POST" action="/customers/toggle" style="display:inline">
-                <?= \App\Support\Csrf::field() ?>
-                    <input type="hidden" name="id" value="<?= $customer->id ?>">
-                    <input type="hidden" name="active" value="<?= $customer->isActive ? '0' : '1' ?>">
-                    <button type="submit" title="<?= $customer->isActive ? 'Deactivate' : 'Activate' ?>"><?= $customer->isActive ? '🚫' : '✅' ?></button>
-                </form>
+                <div class="icon-btn-group">
+                    <a href="/customers/edit?id=<?= $customer->id ?>" class="icon-btn" title="Edit">✏️</a>
+                    <form method="POST" action="/customers/toggle">
+                    <?= \App\Support\Csrf::field() ?>
+                        <input type="hidden" name="id" value="<?= $customer->id ?>">
+                        <input type="hidden" name="active" value="<?= $customer->isActive ? '0' : '1' ?>">
+                        <button type="submit" class="icon-btn" title="<?= $customer->isActive ? 'Deactivate' : 'Activate' ?>"><?= $customer->isActive ? '🚫' : '✅' ?></button>
+                    </form>
+                </div>
             </td>
         </tr>
     <?php endforeach; ?>

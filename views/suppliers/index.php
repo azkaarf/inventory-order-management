@@ -3,7 +3,6 @@
 $pageTitle = 'Suppliers';
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Suppliers</h1>
 <p><a href="/suppliers/create">+ Add Supplier</a></p>
 
 <table>
@@ -19,13 +18,15 @@ require __DIR__ . '/../layout/header.php';
             <td><?= htmlspecialchars($supplier->address ?? '-') ?></td>
             <td><?= $supplier->isActive ? 'Active' : 'Inactive' ?></td>
             <td>
-                <a href="/suppliers/edit?id=<?= $supplier->id ?>" title="Edit">✏️</a>
-                <form method="POST" action="/suppliers/toggle" style="display:inline">
-                <?= \App\Support\Csrf::field() ?>
-                    <input type="hidden" name="id" value="<?= $supplier->id ?>">
-                    <input type="hidden" name="active" value="<?= $supplier->isActive ? '0' : '1' ?>">
-                    <button type="submit" title="<?= $supplier->isActive ? 'Deactivate' : 'Activate' ?>"><?= $supplier->isActive ? '🚫' : '✅' ?></button>
-                </form>
+                <div class="icon-btn-group">
+                    <a href="/suppliers/edit?id=<?= $supplier->id ?>" class="icon-btn" title="Edit">✏️</a>
+                    <form method="POST" action="/suppliers/toggle">
+                    <?= \App\Support\Csrf::field() ?>
+                        <input type="hidden" name="id" value="<?= $supplier->id ?>">
+                        <input type="hidden" name="active" value="<?= $supplier->isActive ? '0' : '1' ?>">
+                        <button type="submit" class="icon-btn" title="<?= $supplier->isActive ? 'Deactivate' : 'Activate' ?>"><?= $supplier->isActive ? '🚫' : '✅' ?></button>
+                    </form>
+                </div>
             </td>
         </tr>
     <?php endforeach; ?>

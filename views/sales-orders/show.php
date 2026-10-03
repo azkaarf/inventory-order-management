@@ -13,7 +13,6 @@ $isSales = $currentUser['role'] === 'Sales';
 $isWarehouse = $currentUser['role'] === 'WarehouseStaff';
 $ownsOrder = $salesOrder->createdBy === (int) $currentUser['id'];
 ?>
-<h1>Sales Order #<?= $salesOrder->id ?></h1>
 <p><a href="/sales-orders">&larr; Back</a></p>
 
 <?php if ($error === 'cannot-submit'): ?>

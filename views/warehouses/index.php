@@ -3,7 +3,6 @@
 $pageTitle = 'Warehouses';
 require __DIR__ . '/../layout/header.php';
 ?>
-<h1>Warehouses</h1>
 <p><a href="/warehouses/create">+ Add Warehouse</a></p>
 
 <table>
@@ -20,13 +19,15 @@ require __DIR__ . '/../layout/header.php';
             <td><?= htmlspecialchars($warehouse->location) ?></td>
             <td><?= $warehouse->isActive ? 'Active' : 'Inactive' ?></td>
             <td>
-                <a href="/warehouses/edit?id=<?= $warehouse->id ?>" title="Edit">✏️</a>
-                <form method="POST" action="/warehouses/toggle" style="display:inline">
-                <?= \App\Support\Csrf::field() ?>
-                    <input type="hidden" name="id" value="<?= $warehouse->id ?>">
-                    <input type="hidden" name="active" value="<?= $warehouse->isActive ? '0' : '1' ?>">
-                    <button type="submit" title="<?= $warehouse->isActive ? 'Deactivate' : 'Activate' ?>"><?= $warehouse->isActive ? '🚫' : '✅' ?></button>
-                </form>
+                <div class="icon-btn-group">
+                    <a href="/warehouses/edit?id=<?= $warehouse->id ?>" class="icon-btn" title="Edit">✏️</a>
+                    <form method="POST" action="/warehouses/toggle">
+                    <?= \App\Support\Csrf::field() ?>
+                        <input type="hidden" name="id" value="<?= $warehouse->id ?>">
+                        <input type="hidden" name="active" value="<?= $warehouse->isActive ? '0' : '1' ?>">
+                        <button type="submit" class="icon-btn" title="<?= $warehouse->isActive ? 'Deactivate' : 'Activate' ?>"><?= $warehouse->isActive ? '🚫' : '✅' ?></button>
+                    </form>
+                </div>
             </td>
         </tr>
     <?php endforeach; ?>
