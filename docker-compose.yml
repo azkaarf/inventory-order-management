@@ -39,6 +39,18 @@ services:
       timeout: 5s
       retries: 10
 
+  sonarqube: 
+    image: sonarqube:26.9.0.129388-community 
+    ports: 
+      - "9000:9000" 
+    volumes: 
+      - sonar_data:/opt/sonarqube/data 
+      - sonar_logs:/opt/sonarqube/logs 
+      - sonar_extensions:/opt/sonarqube/extensions
+
 volumes:
   db_data:
   vendor_data:
+  sonar_data:
+  sonar_logs:
+  sonar_extensions:
