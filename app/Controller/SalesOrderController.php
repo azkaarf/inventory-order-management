@@ -11,8 +11,13 @@ use App\Support\AuthGuard;
 use App\Support\CsvResponse;
 use App\Support\InsufficientStockException;
 
-final class SalesOrderController
+final class SalesOrderController extends BaseController
 {
+    private const ROLES_VIEW = ['Admin', 'Sales', 'WarehouseStaff'];
+    private const ROLES_EDIT = ['Admin', 'Sales'];
+    private const ROLES_ISSUE = ['Admin', 'WarehouseStaff'];
+    private const SHOW_URL = '/sales-orders/show?id=';
+
     public function __construct(
         private readonly SalesOrderService $salesOrderService,
         private readonly CustomerService $customerService,
@@ -23,7 +28,7 @@ final class SalesOrderController
 
     public function index(): void
     {
-        $user = AuthGuard::requireRole(['Admin', 'Sales', 'WarehouseStaff']);
+        $user = AuthGuard::requireRole(self::ROLES_VIEW);
 
         $q = trim($_GET['q'] ?? '');
         $status = $_GET['status'] ?? '';
@@ -39,12 +44,20 @@ final class SalesOrderController
             $createdBy,
         );
 
-        require __DIR__ . '/../../views/sales-orders/index.php';
+        $this->render('sales-orders/index', [
+            'user' => $user,
+            'q' => $q,
+            'status' => $status,
+            'sort' => $sort,
+            'page' => $page,
+            'createdBy' => $createdBy,
+            'result' => $result,
+        ]);
     }
 
     public function exportCsv(): void
     {
-        $user = AuthGuard::requireRole(['Admin', 'Sales', 'WarehouseStaff']);
+        $user = AuthGuard::requireRole(self::ROLES_VIEW);
 
         $q = trim($_GET['q'] ?? '');
         $status = $_GET['status'] ?? '';
@@ -63,34 +76,24 @@ final class SalesOrderController
 
     public function show(): void
     {
-        $user = AuthGuard::requireRole(['Admin', 'Sales', 'WarehouseStaff']);
+        $user = AuthGuard::requireRole(self::ROLES_VIEW);
 
         $salesOrder = $this->findOrFail((int) ($_GET['id'] ?? 0));
         $this->guardOwnershipForSales($user, $salesOrder);
 
-        $products = $this->productService->listProducts();
-        $addItemErrors = [];
-        $issueErrors = [];
-        $oldItem = ['product_id' => '', 'qty' => ''];
-
-        require __DIR__ . '/../../views/sales-orders/show.php';
+        $this->renderShow($user, $salesOrder);
     }
 
     public function showCreateForm(): void
     {
-        AuthGuard::requireRole(['Admin', 'Sales']);
+        AuthGuard::requireRole(self::ROLES_EDIT);
 
-        $customers = $this->customerService->listCustomers();
-        $warehouses = $this->warehouseService->listWarehouses();
-        $errors = [];
-        $old = ['customer_id' => '', 'warehouse_id' => '', 'order_date' => date('Y-m-d')];
-
-        require __DIR__ . '/../../views/sales-orders/create.php';
+        $this->renderCreateForm([], ['customer_id' => '', 'warehouse_id' => '', 'order_date' => date('Y-m-d')]);
     }
 
     public function create(): void
     {
-        $user = AuthGuard::requireRole(['Admin', 'Sales']);
+        $user = AuthGuard::requireRole(self::ROLES_EDIT);
 
         $customerId = (int) ($_POST['customer_id'] ?? 0);
         $warehouseId = (int) ($_POST['warehouse_id'] ?? 0);
@@ -99,22 +102,22 @@ final class SalesOrderController
         $errors = $this->salesOrderService->validateHeader($customerId, $warehouseId, $orderDate);
 
         if (!empty($errors)) {
-            $customers = $this->customerService->listCustomers();
-            $warehouses = $this->warehouseService->listWarehouses();
-            $old = ['customer_id' => (string) $customerId, 'warehouse_id' => (string) $warehouseId, 'order_date' => $orderDate];
-            require __DIR__ . '/../../views/sales-orders/create.php';
+            $this->renderCreateForm($errors, [
+                'customer_id' => (string) $customerId,
+                'warehouse_id' => (string) $warehouseId,
+                'order_date' => $orderDate,
+            ]);
             return;
         }
 
         $so = $this->salesOrderService->createSalesOrder($customerId, $warehouseId, $orderDate, (int) $user['id']);
 
-        header('Location: /sales-orders/show?id=' . $so->id);
-        exit;
+        $this->redirectToShow($so->id);
     }
 
     public function addItem(): void
     {
-        $user = AuthGuard::requireRole(['Admin', 'Sales']);
+        $user = AuthGuard::requireRole(self::ROLES_EDIT);
 
         $soId = (int) ($_POST['sales_order_id'] ?? 0);
         $salesOrder = $this->findOrFail($soId);
@@ -126,23 +129,22 @@ final class SalesOrderController
         $addItemErrors = $this->salesOrderService->validateItem($salesOrder, $productId, $qty);
 
         if (!empty($addItemErrors)) {
-            $products = $this->productService->listProducts();
-            $issueErrors = [];
-            $oldItem = ['product_id' => (string) $productId, 'qty' => $qty];
-            require __DIR__ . '/../../views/sales-orders/show.php';
+            $this->renderShow($user, $salesOrder, [
+                'addItemErrors' => $addItemErrors,
+                'oldItem' => ['product_id' => (string) $productId, 'qty' => $qty],
+            ]);
             return;
         }
 
         $product = $this->productService->findById($productId);
         $this->salesOrderService->addItem($soId, $productId, (int) $qty, $product->sellPrice);
 
-        header('Location: /sales-orders/show?id=' . $soId);
-        exit;
+        $this->redirectToShow($soId);
     }
 
     public function submit(): void
     {
-        $user = AuthGuard::requireRole(['Admin', 'Sales']);
+        $user = AuthGuard::requireRole(self::ROLES_EDIT);
 
         $id = (int) ($_POST['id'] ?? 0);
         $salesOrder = $this->findOrFail($id);
@@ -150,35 +152,32 @@ final class SalesOrderController
 
         $success = $this->salesOrderService->submitForApproval($id);
 
-        header('Location: /sales-orders/show?id=' . $id . ($success ? '' : '&error=cannot-submit'));
-        exit;
+        $this->redirectToShow($id, $success ? null : 'cannot-submit');
     }
 
     public function approve(): void
     {
-        $user = AuthGuard::requireRole(['Admin']);
+        $user = AuthGuard::requireRole(self::ROLE_ADMIN);
 
         $id = (int) ($_POST['id'] ?? 0);
         $success = $this->salesOrderService->approve($id, (int) $user['id']);
 
-        header('Location: /sales-orders/show?id=' . $id . ($success ? '' : '&error=cannot-approve'));
-        exit;
+        $this->redirectToShow($id, $success ? null : 'cannot-approve');
     }
 
     public function reject(): void
     {
-        AuthGuard::requireRole(['Admin']);
+        AuthGuard::requireRole(self::ROLE_ADMIN);
 
         $id = (int) ($_POST['id'] ?? 0);
         $this->salesOrderService->reject($id);
 
-        header('Location: /sales-orders/show?id=' . $id);
-        exit;
+        $this->redirectToShow($id);
     }
 
     public function cancel(): void
     {
-        $user = AuthGuard::requireRole(['Admin', 'Sales']);
+        $user = AuthGuard::requireRole(self::ROLES_EDIT);
 
         $id = (int) ($_POST['id'] ?? 0);
         $salesOrder = $this->findOrFail($id);
@@ -186,13 +185,12 @@ final class SalesOrderController
 
         $success = $this->salesOrderService->cancel($id);
 
-        header('Location: /sales-orders/show?id=' . $id . ($success ? '' : '&error=cannot-cancel'));
-        exit;
+        $this->redirectToShow($id, $success ? null : 'cannot-cancel');
     }
 
     public function issue(): void
     {
-        $user = AuthGuard::requireRole(['Admin', 'WarehouseStaff']);
+        $user = AuthGuard::requireRole(self::ROLES_ISSUE);
 
         $id = (int) ($_POST['id'] ?? 0);
         $salesOrder = $this->findOrFail($id);
@@ -208,15 +206,43 @@ final class SalesOrderController
         }
 
         if (!empty($issueErrors)) {
-            $salesOrder = $this->salesOrderService->findById($id);
-            $products = $this->productService->listProducts();
-            $addItemErrors = [];
-            require __DIR__ . '/../../views/sales-orders/show.php';
+            // Ambil ulang dari DB supaya data yang tampil sesuai kondisi terbaru
+            $this->renderShow($user, $this->findOrFail($id), ['issueErrors' => $issueErrors]);
             return;
         }
 
-        header('Location: /sales-orders/show?id=' . $id);
-        exit;
+        $this->redirectToShow($id);
+    }
+
+    /**
+     * Satu-satunya tempat yang me-render halaman detail SO.
+     * $overrides menimpa nilai default (misalnya error dari form tertentu).
+     */
+    private function renderShow(array $user, SalesOrder $salesOrder, array $overrides = []): void
+    {
+        $this->render('sales-orders/show', array_merge([
+            'user' => $user,
+            'salesOrder' => $salesOrder,
+            'products' => $this->productService->listProducts(),
+            'addItemErrors' => [],
+            'issueErrors' => [],
+            'oldItem' => ['product_id' => '', 'qty' => ''],
+        ], $overrides));
+    }
+
+    private function renderCreateForm(array $errors, array $old): void
+    {
+        $this->render('sales-orders/create', [
+            'customers' => $this->customerService->listCustomers(),
+            'warehouses' => $this->warehouseService->listWarehouses(),
+            'errors' => $errors,
+            'old' => $old,
+        ]);
+    }
+
+    private function redirectToShow(int $id, ?string $error = null): never
+    {
+        $this->redirect(self::SHOW_URL . $id . ($error !== null ? '&error=' . $error : ''));
     }
 
     private function findOrFail(int $id): SalesOrder
@@ -224,9 +250,7 @@ final class SalesOrderController
         $salesOrder = $this->salesOrderService->findById($id);
 
         if ($salesOrder === null) {
-            http_response_code(404);
-            echo '404 Not Found — sales order not found.';
-            exit;
+            $this->abort(404, '404 Not Found — sales order not found.');
         }
 
         return $salesOrder;
@@ -235,9 +259,7 @@ final class SalesOrderController
     private function guardOwnershipForSales(array $user, SalesOrder $salesOrder): void
     {
         if ($user['role'] === 'Sales' && $salesOrder->createdBy !== (int) $user['id']) {
-            http_response_code(403);
-            echo '403 Forbidden — you do not have access to this sales order.';
-            exit;
+            $this->abort(403, '403 Forbidden — you do not have access to this sales order.');
         }
     }
 }

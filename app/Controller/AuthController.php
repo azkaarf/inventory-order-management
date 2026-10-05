@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Service\AuthService;
 
-final class AuthController
+final class AuthController extends BaseController
 {
     public function __construct(
         private readonly AuthService $authService,
@@ -13,8 +13,9 @@ final class AuthController
 
     public function showLoginForm(): void
     {
-        $error = isset($_GET['error']) ? 'Incorrect email or password.' : null;
-        require __DIR__ . '/../../views/auth/login.php';
+        $this->render('auth/login', [
+            'error' => isset($_GET['error']) ? 'Incorrect email or password.' : null,
+        ]);
     }
 
     public function login(): void
@@ -25,8 +26,7 @@ final class AuthController
         $user = $this->authService->attemptLogin($email, $password);
 
         if ($user === null) {
-            header('Location: /login?error=1');
-            exit;
+            $this->redirect('/login?error=1');
         }
 
         // AUTH-01: session ID is regenerated after a successful login
@@ -51,8 +51,7 @@ final class AuthController
             ]);
         }
 
-        header('Location: /dashboard');
-        exit;
+        $this->redirect('/dashboard');
     }
 
     public function logout(): void
@@ -61,7 +60,6 @@ final class AuthController
         $_SESSION = [];
         session_destroy();
 
-        header('Location: /login');
-        exit;
+        $this->redirect('/login');
     }
 }

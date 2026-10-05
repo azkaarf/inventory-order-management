@@ -6,8 +6,10 @@ use App\Entity\Customer;
 use App\Service\CustomerService;
 use App\Support\AuthGuard;
 
-final class CustomerController
+final class CustomerController extends BaseController
 {
+    private const INDEX_URL = '/customers';
+
     public function __construct(
         private readonly CustomerService $customerService,
     ) {
@@ -15,24 +17,26 @@ final class CustomerController
 
     public function index(): void
     {
-        AuthGuard::requireRole(['Admin']);
+        AuthGuard::requireRole(self::ROLE_ADMIN);
 
-        $customers = $this->customerService->listCustomers();
-        require __DIR__ . '/../../views/customers/index.php';
+        $this->render('customers/index', [
+            'customers' => $this->customerService->listCustomers(),
+        ]);
     }
 
     public function showCreateForm(): void
     {
-        AuthGuard::requireRole(['Admin']);
+        AuthGuard::requireRole(self::ROLE_ADMIN);
 
-        $errors = [];
-        $old = ['name' => '', 'contact' => '', 'address' => ''];
-        require __DIR__ . '/../../views/customers/create.php';
+        $this->render('customers/create', [
+            'errors' => [],
+            'old' => ['name' => '', 'contact' => '', 'address' => ''],
+        ]);
     }
 
     public function create(): void
     {
-        AuthGuard::requireRole(['Admin']);
+        AuthGuard::requireRole(self::ROLE_ADMIN);
 
         $name = trim($_POST['name'] ?? '');
         $contact = trim($_POST['contact'] ?? '') ?: null;
@@ -41,32 +45,36 @@ final class CustomerController
         $errors = $this->customerService->validate($name);
 
         if (!empty($errors)) {
-            $old = ['name' => $name, 'contact' => $contact, 'address' => $address];
-            require __DIR__ . '/../../views/customers/create.php';
+            $this->render('customers/create', [
+                'errors' => $errors,
+                'old' => ['name' => $name, 'contact' => $contact, 'address' => $address],
+            ]);
             return;
         }
 
         $this->customerService->createCustomer($name, $contact, $address);
-        header('Location: /customers');
-        exit;
+        $this->redirect(self::INDEX_URL);
     }
 
     public function showEditForm(): void
     {
-        AuthGuard::requireRole(['Admin']);
+        AuthGuard::requireRole(self::ROLE_ADMIN);
 
         $customer = $this->findOrFail((int) ($_GET['id'] ?? 0));
-        $errors = [];
-        $old = ['name' => $customer->name, 'contact' => $customer->contact, 'address' => $customer->address];
-        require __DIR__ . '/../../views/customers/edit.php';
+
+        $this->render('customers/edit', [
+            'customer' => $customer,
+            'errors' => [],
+            'old' => ['name' => $customer->name, 'contact' => $customer->contact, 'address' => $customer->address],
+        ]);
     }
 
     public function update(): void
     {
-        AuthGuard::requireRole(['Admin']);
+        AuthGuard::requireRole(self::ROLE_ADMIN);
 
         $id = (int) ($_POST['id'] ?? 0);
-        $this->findOrFail($id);
+        $customer = $this->findOrFail($id);
 
         $name = trim($_POST['name'] ?? '');
         $contact = trim($_POST['contact'] ?? '') ?: null;
@@ -75,27 +83,28 @@ final class CustomerController
         $errors = $this->customerService->validate($name);
 
         if (!empty($errors)) {
-            $old = ['name' => $name, 'contact' => $contact, 'address' => $address];
-            require __DIR__ . '/../../views/customers/edit.php';
+            $this->render('customers/edit', [
+                'customer' => $customer,
+                'errors' => $errors,
+                'old' => ['name' => $name, 'contact' => $contact, 'address' => $address],
+            ]);
             return;
         }
 
         $this->customerService->updateCustomer($id, $name, $contact, $address);
-        header('Location: /customers');
-        exit;
+        $this->redirect(self::INDEX_URL);
     }
 
     public function toggleActive(): void
     {
-        AuthGuard::requireRole(['Admin']);
+        AuthGuard::requireRole(self::ROLE_ADMIN);
 
         $id = (int) ($_POST['id'] ?? 0);
         $active = (int) ($_POST['active'] ?? 0) === 1;
 
         $this->customerService->setActive($id, $active);
 
-        header('Location: /customers');
-        exit;
+        $this->redirect(self::INDEX_URL);
     }
 
     private function findOrFail(int $id): Customer
@@ -103,9 +112,7 @@ final class CustomerController
         $customer = $this->customerService->findById($id);
 
         if ($customer === null) {
-            http_response_code(404);
-            echo '404 Not Found — customer not found.';
-            exit;
+            $this->abort(404, '404 Not Found — customer not found.');
         }
 
         return $customer;

@@ -61,12 +61,10 @@ final class MySqlDashboardRepository implements DashboardRepositoryInterface
             $rows = $stmt->fetchAll();
         }
 
-        $counts = array_combine(
+        return array_combine(
             array_column($rows, 'status'),
             array_map('intval', array_column($rows, 'cnt')),
         );
-
-        return $counts;
     }
 
     public function getPurchaseOrdersAwaitingReceipt(): array

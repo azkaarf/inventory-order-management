@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Dto\ProductData;
 use App\Entity\Product;
 use App\Repository\CategoryRepositoryInterface;
 use App\Repository\ProductRepositoryInterface;
@@ -72,26 +73,31 @@ final class ProductService
         return $this->stockRepository->getTotalForProduct($id);
     }
 
-    /** @return string[] */
-    public function validate(
-        string $sku,
-        string $name,
-        int $categoryId,
-        string $unit,
-        string $buyPrice,
-        string $sellPrice,
-        string $reorderPoint,
-        ?int $excludeId = null,
-    ): array {
+    /**
+     * Validasi input mentah dari form produk.
+     *
+     * @param array<string,string> $form keys: sku, name, category_id, unit, buy_price, sell_price, reorder_point
+     * @return string[]
+     */
+    public function validate(array $form, ?int $excludeId = null): array
+    {
+        $sku = trim($form['sku'] ?? '');
+        $name = trim($form['name'] ?? '');
+        $categoryId = (int) ($form['category_id'] ?? 0);
+        $unit = trim($form['unit'] ?? '');
+        $buyPrice = $form['buy_price'] ?? '';
+        $sellPrice = $form['sell_price'] ?? '';
+        $reorderPoint = $form['reorder_point'] ?? '';
+
         $errors = [];
 
-        if (trim($sku) === '') {
+        if ($sku === '') {
             $errors[] = 'SKU is required.';
         } elseif ($this->productRepository->skuExists($sku, $excludeId)) {
             $errors[] = 'SKU is already used by another product.';
         }
 
-        if (trim($name) === '') {
+        if ($name === '') {
             $errors[] = 'Product name is required.';
         }
 
@@ -99,7 +105,7 @@ final class ProductService
             $errors[] = 'Invalid category.';
         }
 
-        if (trim($unit) === '') {
+        if ($unit === '') {
             $errors[] = 'Unit is required.';
         }
 
@@ -118,26 +124,9 @@ final class ProductService
         return $errors;
     }
 
-    public function createProduct(
-        string $sku,
-        string $name,
-        int $categoryId,
-        string $unit,
-        float $buyPrice,
-        float $sellPrice,
-        int $reorderPoint,
-        ?string $imagePath,
-    ): Product {
-        $product = $this->productRepository->create(
-            $sku,
-            $name,
-            $categoryId,
-            $unit,
-            $buyPrice,
-            $sellPrice,
-            $reorderPoint,
-            $imagePath,
-        );
+    public function createProduct(string $sku, ProductData $data): Product
+    {
+        $product = $this->productRepository->create($sku, $data);
 
         // WH-01: a new product immediately gets a stock row (0) in every active warehouse
         $this->stockRepository->initializeForProduct($product->id);
@@ -145,17 +134,9 @@ final class ProductService
         return $product;
     }
 
-    public function updateProduct(
-        int $id,
-        string $name,
-        int $categoryId,
-        string $unit,
-        float $buyPrice,
-        float $sellPrice,
-        int $reorderPoint,
-        ?string $imagePath,
-    ): void {
-        $this->productRepository->update($id, $name, $categoryId, $unit, $buyPrice, $sellPrice, $reorderPoint, $imagePath);
+    public function updateProduct(int $id, ProductData $data): void
+    {
+        $this->productRepository->update($id, $data);
     }
 
     public function setActive(int $id, bool $isActive): void

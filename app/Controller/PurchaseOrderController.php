@@ -11,9 +11,10 @@ use App\Service\WarehouseService;
 use App\Support\AuthGuard;
 use App\Support\CsvResponse;
 
-final class PurchaseOrderController
+final class PurchaseOrderController extends BaseController
 {
     private const ALLOWED_ROLES = ['Admin', 'WarehouseStaff'];
+    private const SHOW_URL = '/purchase-orders/show?id=';
 
     public function __construct(
         private readonly PurchaseOrderService $purchaseOrderService,
@@ -39,7 +40,13 @@ final class PurchaseOrderController
             $page,
         );
 
-        require __DIR__ . '/../../views/purchase-orders/index.php';
+        $this->render('purchase-orders/index', [
+            'q' => $q,
+            'status' => $status,
+            'sort' => $sort,
+            'page' => $page,
+            'result' => $result,
+        ]);
     }
 
     public function exportCsv(): void
@@ -65,24 +72,15 @@ final class PurchaseOrderController
         AuthGuard::requireRole(self::ALLOWED_ROLES);
 
         $purchaseOrder = $this->findOrFail((int) ($_GET['id'] ?? 0));
-        $products = $this->productService->listProducts();
-        $receiveErrors = [];
-        $addItemErrors = [];
-        $oldItem = ['product_id' => '', 'qty' => '', 'buy_price' => ''];
 
-        require __DIR__ . '/../../views/purchase-orders/show.php';
+        $this->renderShow($purchaseOrder);
     }
 
     public function showCreateForm(): void
     {
         AuthGuard::requireRole(self::ALLOWED_ROLES);
 
-        $suppliers = $this->supplierService->listSuppliers();
-        $warehouses = $this->warehouseService->listWarehouses();
-        $errors = [];
-        $old = ['supplier_id' => '', 'warehouse_id' => '', 'order_date' => date('Y-m-d')];
-
-        require __DIR__ . '/../../views/purchase-orders/create.php';
+        $this->renderCreateForm([], ['supplier_id' => '', 'warehouse_id' => '', 'order_date' => date('Y-m-d')]);
     }
 
     public function create(): void
@@ -96,17 +94,17 @@ final class PurchaseOrderController
         $errors = $this->purchaseOrderService->validateHeader($supplierId, $warehouseId, $orderDate);
 
         if (!empty($errors)) {
-            $suppliers = $this->supplierService->listSuppliers();
-            $warehouses = $this->warehouseService->listWarehouses();
-            $old = ['supplier_id' => (string) $supplierId, 'warehouse_id' => (string) $warehouseId, 'order_date' => $orderDate];
-            require __DIR__ . '/../../views/purchase-orders/create.php';
+            $this->renderCreateForm($errors, [
+                'supplier_id' => (string) $supplierId,
+                'warehouse_id' => (string) $warehouseId,
+                'order_date' => $orderDate,
+            ]);
             return;
         }
 
         $po = $this->purchaseOrderService->createPurchaseOrder($supplierId, $warehouseId, $orderDate, (int) $user['id']);
 
-        header('Location: /purchase-orders/show?id=' . $po->id);
-        exit;
+        $this->redirectToShow($po->id);
     }
 
     public function addItem(): void
@@ -123,17 +121,16 @@ final class PurchaseOrderController
         $addItemErrors = $this->purchaseOrderService->validateItem($purchaseOrder, $productId, $qty, $buyPrice);
 
         if (!empty($addItemErrors)) {
-            $products = $this->productService->listProducts();
-            $receiveErrors = [];
-            $oldItem = ['product_id' => (string) $productId, 'qty' => $qty, 'buy_price' => $buyPrice];
-            require __DIR__ . '/../../views/purchase-orders/show.php';
+            $this->renderShow($purchaseOrder, [
+                'addItemErrors' => $addItemErrors,
+                'oldItem' => ['product_id' => (string) $productId, 'qty' => $qty, 'buy_price' => $buyPrice],
+            ]);
             return;
         }
 
         $this->purchaseOrderService->addItem($poId, $productId, (int) $qty, (float) $buyPrice);
 
-        header('Location: /purchase-orders/show?id=' . $poId);
-        exit;
+        $this->redirectToShow($poId);
     }
 
     public function markAsOrdered(): void
@@ -143,8 +140,7 @@ final class PurchaseOrderController
         $id = (int) ($_POST['id'] ?? 0);
         $success = $this->purchaseOrderService->markAsOrdered($id);
 
-        header('Location: /purchase-orders/show?id=' . $id . ($success ? '' : '&error=cannot-order'));
-        exit;
+        $this->redirectToShow($id, $success ? null : 'cannot-order');
     }
 
     public function cancel(): void
@@ -154,8 +150,7 @@ final class PurchaseOrderController
         $id = (int) ($_POST['id'] ?? 0);
         $success = $this->purchaseOrderService->cancel($id);
 
-        header('Location: /purchase-orders/show?id=' . $id . ($success ? '' : '&error=cannot-cancel'));
-        exit;
+        $this->redirectToShow($id, $success ? null : 'cannot-cancel');
     }
 
     public function receiveItem(): void
@@ -172,16 +167,43 @@ final class PurchaseOrderController
         $receiveErrors = $this->purchaseOrderService->validateReceipt($purchaseOrder, $item, $qty);
 
         if (!empty($receiveErrors)) {
-            $products = $this->productService->listProducts();
-            $addItemErrors = [];
-            require __DIR__ . '/../../views/purchase-orders/show.php';
+            $this->renderShow($purchaseOrder, ['receiveErrors' => $receiveErrors]);
             return;
         }
 
         $this->purchaseOrderService->receiveItem($purchaseOrder, $item, $qty, (int) $user['id']);
 
-        header('Location: /purchase-orders/show?id=' . $poId);
-        exit;
+        $this->redirectToShow($poId);
+    }
+
+    /**
+     * Satu-satunya tempat yang me-render halaman detail PO.
+     * $overrides menimpa nilai default (misalnya error dari form tertentu).
+     */
+    private function renderShow(PurchaseOrder $purchaseOrder, array $overrides = []): void
+    {
+        $this->render('purchase-orders/show', array_merge([
+            'purchaseOrder' => $purchaseOrder,
+            'products' => $this->productService->listProducts(),
+            'receiveErrors' => [],
+            'addItemErrors' => [],
+            'oldItem' => ['product_id' => '', 'qty' => '', 'buy_price' => ''],
+        ], $overrides));
+    }
+
+    private function renderCreateForm(array $errors, array $old): void
+    {
+        $this->render('purchase-orders/create', [
+            'suppliers' => $this->supplierService->listSuppliers(),
+            'warehouses' => $this->warehouseService->listWarehouses(),
+            'errors' => $errors,
+            'old' => $old,
+        ]);
+    }
+
+    private function redirectToShow(int $id, ?string $error = null): never
+    {
+        $this->redirect(self::SHOW_URL . $id . ($error !== null ? '&error=' . $error : ''));
     }
 
     private function findOrFail(int $id): PurchaseOrder
@@ -189,9 +211,7 @@ final class PurchaseOrderController
         $purchaseOrder = $this->purchaseOrderService->findById($id);
 
         if ($purchaseOrder === null) {
-            http_response_code(404);
-            echo '404 Not Found — purchase order not found.';
-            exit;
+            $this->abort(404, '404 Not Found — purchase order not found.');
         }
 
         return $purchaseOrder;
@@ -205,8 +225,6 @@ final class PurchaseOrderController
             }
         }
 
-        http_response_code(404);
-        echo '404 Not Found — purchase order item not found.';
-        exit;
+        $this->abort(404, '404 Not Found — purchase order item not found.');
     }
 }

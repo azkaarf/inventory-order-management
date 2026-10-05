@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Service\DashboardService;
 use App\Support\AuthGuard;
 
-final class DashboardController
+final class DashboardController extends BaseController
 {
     public function __construct(
         private readonly DashboardService $dashboardService,
@@ -21,27 +21,30 @@ final class DashboardController
         $user = AuthGuard::requireLogin();
 
         if ($user['role'] === 'Admin') {
-            $totalInventoryValue = $this->dashboardService->totalInventoryValue();
-            $lowStockProducts = $this->dashboardService->lowStockProducts();
-            $poStatusCounts = $this->dashboardService->purchaseOrderStatusCounts();
-            $soStatusCounts = $this->dashboardService->salesOrderStatusCounts();
-
-            require __DIR__ . '/../../views/dashboard/admin.php';
+            $this->render('dashboard/admin', [
+                'user' => $user,
+                'totalInventoryValue' => $this->dashboardService->totalInventoryValue(),
+                'lowStockProducts' => $this->dashboardService->lowStockProducts(),
+                'poStatusCounts' => $this->dashboardService->purchaseOrderStatusCounts(),
+                'soStatusCounts' => $this->dashboardService->salesOrderStatusCounts(),
+            ]);
             return;
         }
 
         if ($user['role'] === 'Sales') {
-            $soStatusCounts = $this->dashboardService->salesOrderStatusCounts((int) $user['id']);
-
-            require __DIR__ . '/../../views/dashboard/sales.php';
+            $this->render('dashboard/sales', [
+                'user' => $user,
+                'soStatusCounts' => $this->dashboardService->salesOrderStatusCounts((int) $user['id']),
+            ]);
             return;
         }
 
         // WarehouseStaff
-        $poAwaitingReceipt = $this->dashboardService->purchaseOrdersAwaitingReceipt();
-        $soAwaitingIssue = $this->dashboardService->salesOrdersAwaitingIssue();
-        $lowStockProducts = $this->dashboardService->lowStockProducts();
-
-        require __DIR__ . '/../../views/dashboard/warehouse.php';
+        $this->render('dashboard/warehouse', [
+            'user' => $user,
+            'poAwaitingReceipt' => $this->dashboardService->purchaseOrdersAwaitingReceipt(),
+            'soAwaitingIssue' => $this->dashboardService->salesOrdersAwaitingIssue(),
+            'lowStockProducts' => $this->dashboardService->lowStockProducts(),
+        ]);
     }
 }

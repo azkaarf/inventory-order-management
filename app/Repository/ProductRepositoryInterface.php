@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Dto\ProductData;
 use App\Entity\Product;
 
 interface ProductRepositoryInterface
@@ -20,27 +21,9 @@ interface ProductRepositoryInterface
 
     public function skuExists(string $sku, ?int $excludeId = null): bool;
 
-    public function create(
-        string $sku,
-        string $name,
-        int $categoryId,
-        string $unit,
-        float $buyPrice,
-        float $sellPrice,
-        int $reorderPoint,
-        ?string $imagePath,
-    ): Product;
+    public function create(string $sku, ProductData $data): Product;
 
-    public function update(
-        int $id,
-        string $name,
-        int $categoryId,
-        string $unit,
-        float $buyPrice,
-        float $sellPrice,
-        int $reorderPoint,
-        ?string $imagePath,
-    ): void;
+    public function update(int $id, ProductData $data): void;
 
     public function setActive(int $id, bool $isActive): void;
 }

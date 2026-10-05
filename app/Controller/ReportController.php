@@ -10,7 +10,7 @@ use App\Support\CsvResponse;
  * REPORT-01: CSV exports built from the exact same aggregation queries as
  * the dashboard (DashboardService), not a separate parallel query.
  */
-final class ReportController
+final class ReportController extends BaseController
 {
     public function __construct(
         private readonly DashboardService $dashboardService,
@@ -21,11 +21,11 @@ final class ReportController
     {
         AuthGuard::requireRole(['Admin', 'Sales', 'WarehouseStaff']);
 
-        $from = $_GET['from'] ?? date('Y-m-d', strtotime('-30 days'));
-        $to = $_GET['to'] ?? date('Y-m-d');
-        $error = $_GET['error'] ?? null;
-
-        require __DIR__ . '/../../views/reports/index.php';
+        $this->render('reports/index', [
+            'from' => $_GET['from'] ?? date('Y-m-d', strtotime('-30 days')),
+            'to' => $_GET['to'] ?? date('Y-m-d'),
+            'error' => $_GET['error'] ?? null,
+        ]);
     }
 
     public function stockLedgerCsv(): void
@@ -34,8 +34,7 @@ final class ReportController
 
         [$from, $to, $redirect] = $this->resolveDateRange();
         if ($redirect !== null) {
-            header('Location: ' . $redirect);
-            exit;
+            $this->redirect($redirect);
         }
 
         $rows = $this->dashboardService->stockLedgerReport($from, $to);
@@ -63,8 +62,7 @@ final class ReportController
 
         [$from, $to, $redirect] = $this->resolveDateRange();
         if ($redirect !== null) {
-            header('Location: ' . $redirect);
-            exit;
+            $this->redirect($redirect);
         }
 
         $createdBy = $user['role'] === 'Sales' ? (int) $user['id'] : null;
