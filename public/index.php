@@ -53,8 +53,6 @@ $supplierService = new SupplierService($supplierRepository);
 $customerService = new CustomerService($customerRepository);
 $warehouseService = new WarehouseService($warehouseRepository);
 
-// API-01: one dynamic route, handled as a special case (a full regex router
-// would be overkill for a single endpoint at this stage — see tech-debt notes).
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -189,8 +187,6 @@ if (!isset($routes[$key])) {
     exit;
 }
 
-// Bab 6.2: CSRF check terpusat di satu tempat (bukan diulang per Controller),
-// sama seperti AuthGuard - berlaku buat semua route POST tanpa kecuali.
 if ($method === 'POST' && !Csrf::verify($_POST['_csrf'] ?? null)) {
     http_response_code(403);
     echo '403 Forbidden — invalid or missing CSRF token. Please go back and try again.';

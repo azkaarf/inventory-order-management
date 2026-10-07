@@ -6,25 +6,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Repository\MySqlDashboardRepository;
 
-/**
- * JOB-01: a standalone script, deliberately decoupled from the web request
- * cycle — no Apache, no session, no HTTP involved. It reuses the exact same
- * aggregation query the Admin/Warehouse dashboards already use
- * (DashboardRepository::getLowStockProducts()), so this report can never
- * drift out of sync with what the app itself shows.
- *
- * Run manually via:
- *   docker compose exec app php scripts/check-low-stock.php
- *
- * Not wired up to an actual cron scheduler — the brief explicitly says that
- * isn't required, just that the task be separable from the web request
- * lifecycle and runnable on demand.
- *
- * Bab 12.2: this batch job is exactly the kind of work worth measuring -
- * wall time and peak memory are printed at the end as evidence, rather than
- * assumed to be fine.
- */
-
 $startedAt = hrtime(true);
 
 $dashboardRepository = new MySqlDashboardRepository();

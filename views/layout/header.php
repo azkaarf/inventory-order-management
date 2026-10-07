@@ -1,9 +1,4 @@
 <?php
-/**
- * Shared layout header — required at the top of every view.
- * Set $pageTitle before requiring this if you want a custom tab title.
- * Optionally set $pageSubtitle for a one-line description under the title.
- */
 $pageTitle = $pageTitle ?? 'BLISS — Beauty Logistics, Inventory & Sales System';
 $pageSubtitle = $pageSubtitle ?? null;
 $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';

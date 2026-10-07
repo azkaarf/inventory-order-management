@@ -12,10 +12,6 @@ final class DashboardController extends BaseController
     ) {
     }
 
-    /**
-     * DASH-01: every number here comes from an aggregation query, not a
-     * static figure — and each role sees a different view.
-     */
     public function show(): void
     {
         $user = AuthGuard::requireLogin();
@@ -39,7 +35,6 @@ final class DashboardController extends BaseController
             return;
         }
 
-        // WarehouseStaff
         $this->render('dashboard/warehouse', [
             'user' => $user,
             'poAwaitingReceipt' => $this->dashboardService->purchaseOrdersAwaitingReceipt(),

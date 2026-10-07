@@ -125,7 +125,6 @@ final class ProductController extends BaseController
         $product = $this->findOrFail($productId);
 
         $old = $this->readFormData();
-        // SKU tidak bisa diubah saat edit, jadi validasi pakai SKU yang tersimpan
         $errors = $this->productService->validate(
             array_merge($old, ['sku' => $product->sku]),
             excludeId: $productId,

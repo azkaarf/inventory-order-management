@@ -35,9 +35,6 @@ final class Database
                         throw new PDOException('Database connection failed.');
                     }
 
-                    // MySQL's official image briefly restarts internally right after running
-                    // init.sql on a fresh volume (i.e. right after `docker compose down -v`) —
-                    // a short retry absorbs that window instead of failing the whole request.
                     sleep(1);
                 }
             }

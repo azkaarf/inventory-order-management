@@ -5,12 +5,6 @@ namespace App\Controller;
 use App\Repository\ProductRepositoryInterface;
 use App\Repository\StockRepositoryInterface;
 
-/**
- * API-01: at least one JSON endpoint, separate from the regular HTML pages.
- * Same auth check as any other page, but responds with Content-Type:
- * application/json and proper status codes (200/401/404) instead of an
- * HTML error page.
- */
 final class ApiController
 {
     public function __construct(
