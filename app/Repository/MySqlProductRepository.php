@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Product;
 use App\Support\Database;
+use App\Dto\ProductData;
 
 final class MySqlProductRepository implements ProductRepositoryInterface
 {
@@ -54,41 +55,54 @@ final class MySqlProductRepository implements ProductRepositoryInterface
         return (bool) $stmt->fetchColumn();
     }
 
-    public function create(
-        string $sku,
-        string $name,
-        int $categoryId,
-        string $unit,
-        float $buyPrice,
-        float $sellPrice,
-        int $reorderPoint,
-        ?string $imagePath,
-    ): Product {
+    public function create(string $sku, ProductData $data): Product
+    {
         $stmt = Database::connection()->prepare(
             'INSERT INTO product (sku, name, category_id, unit, buy_price, sell_price, reorder_point, image_path, is_active)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)'
         );
-        $stmt->execute([$sku, $name, $categoryId, $unit, $buyPrice, $sellPrice, $reorderPoint, $imagePath]);
+        $stmt->execute([
+            $sku,
+            $data->name,
+            $data->categoryId,
+            $data->unit,
+            $data->buyPrice,
+            $data->sellPrice,
+            $data->reorderPoint,
+            $data->imagePath,
+        ]);
         $id = (int) Database::connection()->lastInsertId();
 
-        return new Product($id, $sku, $name, $categoryId, $unit, $buyPrice, $sellPrice, $reorderPoint, $imagePath, true);
+        return new Product(
+            id: $id,
+            sku: $sku,
+            name: $data->name,
+            categoryId: $data->categoryId,
+            unit: $data->unit,
+            buyPrice: $data->buyPrice,
+            sellPrice: $data->sellPrice,
+            reorderPoint: $data->reorderPoint,
+            imagePath: $data->imagePath,
+            isActive: true,
+        );
     }
 
-    public function update(
-        int $id,
-        string $name,
-        int $categoryId,
-        string $unit,
-        float $buyPrice,
-        float $sellPrice,
-        int $reorderPoint,
-        ?string $imagePath,
-    ): void {
+    public function update(int $id, ProductData $data): void
+    {
         $stmt = Database::connection()->prepare(
             'UPDATE product SET name = ?, category_id = ?, unit = ?, buy_price = ?, sell_price = ?,
                 reorder_point = ?, image_path = ? WHERE id = ?'
         );
-        $stmt->execute([$name, $categoryId, $unit, $buyPrice, $sellPrice, $reorderPoint, $imagePath, $id]);
+        $stmt->execute([
+            $data->name,
+            $data->categoryId,
+            $data->unit,
+            $data->buyPrice,
+            $data->sellPrice,
+            $data->reorderPoint,
+            $data->imagePath,
+            $id,
+        ]);
     }
 
     public function setActive(int $id, bool $isActive): void

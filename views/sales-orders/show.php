@@ -34,25 +34,31 @@ $ownsOrder = $salesOrder->createdBy === (int) $currentUser['id'];
     <?php endif; ?>
 </table>
 
-<p>
+<div class="action-bar">
     <?php if ($salesOrder->status === 'Draft' && ($isAdmin || ($isSales && $ownsOrder))): ?>
-        <form method="POST" action="/sales-orders/submit" style="display:inline">
-                <?= \App\Support\Csrf::field() ?>
+        <form method="POST" action="/sales-orders/submit">
+            <?= \App\Support\Csrf::field() ?>
             <input type="hidden" name="id" value="<?= $salesOrder->id ?>">
-            <button type="submit" title="Submit for Approval">📨</button>
+            <button type="submit" class="btn-action" title="Send this order to an Admin for approval">
+                <span class="btn-icon">📨</span> Submit for Approval
+            </button>
         </form>
     <?php endif; ?>
 
     <?php if ($salesOrder->status === 'PendingApproval' && $isAdmin && !$ownsOrder): ?>
-        <form method="POST" action="/sales-orders/approve" style="display:inline">
-                <?= \App\Support\Csrf::field() ?>
+        <form method="POST" action="/sales-orders/approve">
+            <?= \App\Support\Csrf::field() ?>
             <input type="hidden" name="id" value="<?= $salesOrder->id ?>">
-            <button type="submit" title="Approve">✅</button>
+            <button type="submit" class="btn-action btn-approve" title="Approve this order so the warehouse can process it">
+                <span class="btn-icon">✅</span> Approve
+            </button>
         </form>
-        <form method="POST" action="/sales-orders/reject" style="display:inline" onsubmit="return confirm('Reject this sales order?');">
-                <?= \App\Support\Csrf::field() ?>
+        <form method="POST" action="/sales-orders/reject" onsubmit="return confirm('Reject this sales order?');">
+            <?= \App\Support\Csrf::field() ?>
             <input type="hidden" name="id" value="<?= $salesOrder->id ?>">
-            <button type="submit" title="Reject">❌</button>
+            <button type="submit" class="btn-action btn-reject" title="Reject this order">
+                <span class="btn-icon">❌</span> Reject
+            </button>
         </form>
     <?php endif; ?>
 
@@ -61,21 +67,25 @@ $ownsOrder = $salesOrder->createdBy === (int) $currentUser['id'];
     <?php endif; ?>
 
     <?php if ($salesOrder->status === 'Approved' && ($isAdmin || $isWarehouse)): ?>
-        <form method="POST" action="/sales-orders/issue" style="display:inline">
-                <?= \App\Support\Csrf::field() ?>
+        <form method="POST" action="/sales-orders/issue">
+            <?= \App\Support\Csrf::field() ?>
             <input type="hidden" name="id" value="<?= $salesOrder->id ?>">
-            <button type="submit" title="Process Goods Issue">📤</button>
+            <button type="submit" class="btn-action btn-issue" title="Take the items out of the warehouse and reduce stock">
+                <span class="btn-icon">📤</span> Process Goods Issue
+            </button>
         </form>
     <?php endif; ?>
 
     <?php if (!in_array($salesOrder->status, ['Fulfilled', 'Cancelled'], true) && ($isAdmin || ($isSales && $ownsOrder))): ?>
-        <form method="POST" action="/sales-orders/cancel" style="display:inline" onsubmit="return confirm('Cancel this sales order?');">
-                <?= \App\Support\Csrf::field() ?>
+        <form method="POST" action="/sales-orders/cancel" onsubmit="return confirm('Cancel this sales order?');">
+            <?= \App\Support\Csrf::field() ?>
             <input type="hidden" name="id" value="<?= $salesOrder->id ?>">
-            <button type="submit" title="Cancel">✖️</button>
+            <button type="submit" class="btn-action btn-cancel" title="Cancel this order">
+                <span class="btn-icon">✖️</span> Cancel Order
+            </button>
         </form>
     <?php endif; ?>
-</p>
+</div>
 
 <h2>Items</h2>
 
@@ -125,7 +135,7 @@ $ownsOrder = $salesOrder->createdBy === (int) $currentUser['id'];
         </label>
         <div id="so-stock-info" class="hint"></div>
         <label>Quantity <input type="number" name="qty" min="1" value="<?= htmlspecialchars($oldItem['qty']) ?>" required></label>
-        <button type="submit" title="Add Item">➕</button>
+        <button type="submit" class="btn-action" title="Add Item"><span class="btn-icon">➕</span> Add Item</button>
     </form>
 
     <script src="/assets/js/stock-availability.js?v=<?= @filemtime(__DIR__ . '/../../public/assets/js/stock-availability.js') ?: time() ?>"></script>
@@ -141,10 +151,6 @@ $ownsOrder = $salesOrder->createdBy === (int) $currentUser['id'];
 
         const { StockLookupError, formatAvailabilityText } = window.StockAvailability;
 
-        // Bab 5.1 (Web Storage): cache jawaban per SKU selama sesi supaya
-        // pilih-ulang produk yang sama nggak selalu hit network. TTL pendek
-        // (30 detik) karena stok ini data yang benar-benar berubah (goods
-        // receipt/issue), bukan data statis yang aman di-cache lama.
         const CACHE_TTL_MS = 30000;
         const cacheKey = (sku) => `stock-availability:${sku}`;
 
@@ -157,8 +163,6 @@ $ownsOrder = $salesOrder->createdBy === (int) $currentUser['id'];
                 const { data, cachedAt } = JSON.parse(raw);
                 return Date.now() - cachedAt > CACHE_TTL_MS ? null : data;
             } catch {
-                // sessionStorage bisa nggak tersedia (private mode/quota penuh) -
-                // gagal diam-diam, fallback ke network, jangan sampai fitur utama ikut mati.
                 return null;
             }
         };
@@ -167,14 +171,9 @@ $ownsOrder = $salesOrder->createdBy === (int) $currentUser['id'];
             try {
                 sessionStorage.setItem(cacheKey(sku), JSON.stringify({ data, cachedAt: Date.now() }));
             } catch {
-                // idem - abaikan saja kalau storage nggak bisa ditulis.
             }
         };
 
-        // Bab 2.3 (recursion) + Bab 4.1 (setTimeout): retry sekali dengan
-        // delay pendek kalau kegagalan kemungkinan cuma masalah jaringan
-        // sesaat. 404 (produk memang nggak ada) sengaja TIDAK di-retry -
-        // mengulang tidak akan mengubah hasil itu.
         const fetchAvailability = (sku, attemptsLeft = 2) =>
             fetch(`/api/products/${encodeURIComponent(sku)}/availability`)
                 .then((response) => {
@@ -222,8 +221,6 @@ $ownsOrder = $salesOrder->createdBy === (int) $currentUser['id'];
                     ? 'This product could not be found.'
                     : 'Could not check stock for this product.';
             } finally {
-                // Bab 12.2: bukti profiling sederhana - biar bisa dibuktikan
-                // lookup ini nggak jadi hotspot, bukan sekadar diasumsikan cepat.
                 console.debug(`stock availability lookup: ${(performance.now() - startedAt).toFixed(1)}ms`);
             }
         });

@@ -4,6 +4,9 @@ RUN apt-get update && apt-get install -y \
         git unzip libzip-dev libpng-dev libonig-dev \
     && docker-php-ext-install pdo pdo_mysql mysqli zip gd \
     && a2enmod rewrite
+
+RUN pecl install pcov && docker-php-ext-enable pcov
+
 COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

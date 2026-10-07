@@ -63,3 +63,19 @@ the warning itself.
 | PHPCS | PSR-12 | 0 | 15 (all explained above, same cause) |
 
 Both tools report **zero critical errors**, satisfying TEST-03.
+
+## Cakupan coverage SonarQube
+
+`sonar.coverage.exclusions` mengecualikan `app/Controller/**`, `public/index.php`,
+`config/**`, dan `scripts/**` dari perhitungan coverage.
+
+Alasan: Controller hanya penghubung HTTP (membaca request, memanggil Service,
+redirect/render). Logika bisnis berada di Service dan Repository, yang diukur
+penuh. Brief (§4.3) juga mengecualikan automated end-to-end test, sehingga
+Controller tidak dites otomatis di project ini.
+
+Yang tidak berubah: file-file itu tetap dianalisis SonarQube untuk bug,
+kerentanan, dan duplikasi. Hanya perhitungan coverage-nya yang dibatasi.
+
+Keterbatasan yang disadari: Controller belum punya test otomatis. Prioritas
+berikutnya adalah menambah test untuk Controller lewat request HTTP simulasi.

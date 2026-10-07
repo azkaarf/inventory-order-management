@@ -28,7 +28,7 @@ final class MySqlGoodsIssueRepository implements GoodsIssueRepositoryInterface
 
                 if ($available === false || (int) $available < $item['qty']) {
                     throw new InsufficientStockException(sprintf(
-                        'Not enough stock for "%s" (available: %d, requested: %d).',
+                        'Not enough stock for "%s" (available: %d, requested: %d). Restock via Purchase Order, or cancel this order.',
                         $item['product_name'],
                         $available === false ? 0 : (int) $available,
                         $item['qty'],

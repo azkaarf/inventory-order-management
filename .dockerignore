@@ -12,3 +12,5 @@ node_modules
 .phpunit.result.cache
 *.log
 .DS_Store
+
+coverage.xml

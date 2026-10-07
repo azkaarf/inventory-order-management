@@ -2,6 +2,7 @@
 
 namespace Tests\Integration;
 
+use App\Dto\ProductData;
 use App\Repository\MySqlCategoryRepository;
 use App\Repository\MySqlGoodsReceiptRepository;
 use App\Repository\MySqlProductRepository;
@@ -37,13 +38,15 @@ final class GoodsReceiptIntegrationTest extends TestCase
 
         $product = (new MySqlProductRepository())->create(
             'TEST-SKU-' . bin2hex(random_bytes(4)),
-            'Integration Test Product',
-            $category->id,
-            'pcs',
-            1000.0,
-            1500.0,
-            5,
-            null,
+            new ProductData(
+                name: 'Integration Test Product',
+                categoryId: $category->id,
+                unit: 'pcs',
+                buyPrice: 1000.0,
+                sellPrice: 1500.0,
+                reorderPoint: 5,
+                imagePath: null,
+            ),
         );
         $this->productId = $product->id;
 

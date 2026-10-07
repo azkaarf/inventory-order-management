@@ -11,6 +11,11 @@
             <directory>tests/Integration</directory>
         </testsuite>
     </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
     <php>
         <!--
             Bab 10.3: test database terisolasi dari data development.

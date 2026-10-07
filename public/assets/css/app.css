@@ -850,6 +850,74 @@ form.stacked input:user-invalid ~ .field-hint-error {
     padding: 10px 12px;
 }
 
+/* ===== Workflow action buttons (ikon + label teks) ===== */
+.action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 0 26px;
+}
+
+.action-bar form {
+    margin: 0;
+    display: inline-flex;
+}
+
+button.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+button.btn-action .btn-icon {
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+button.btn-action.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.82rem;
+}
+
+/* Approve = hijau (aksi positif), Goods Issue = biru (aksi proses gudang) */
+button.btn-action.btn-approve { background: #16a34a; color: #fff; }
+button.btn-action.btn-approve:hover { background: #15803d; }
+
+button.btn-action.btn-issue { background: #2563eb; color: #fff; }
+button.btn-action.btn-issue:hover { background: #1d4ed8; }
+
+/* Reject & Cancel = outline (aksi destruktif jangan terlalu mencolok, tapi jelas) */
+button.btn-action.btn-reject {
+    background: #fff;
+    color: #b91c1c;
+    border-color: #fca5a5;
+}
+button.btn-action.btn-reject:hover { background: #fee2e2; }
+
+button.btn-action.btn-cancel {
+    background: #fff;
+    color: #475569;
+    border-color: var(--color-border);
+}
+button.btn-action.btn-cancel:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fca5a5;
+}
+
+.receive-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 /* ===== Responsive (UI-01: usable at 360px) ===== */
 @media (max-width: 768px) {
     .topbar-search {
